@@ -1,9 +1,9 @@
+[README.md](https://github.com/user-attachments/files/28853971/README.md)
 # COLMAC TOOLWORKS
 
 Offline single-file tools you own. No cloud, no install, no subscription — nothing leaves your machine. Buy once, keep forever, works with no internet.
 
-**Live store:** https://YOUR-USERNAME.github.io/colmac-toolworks/
-_(replace with your real Pages URL once it's live)_
+**Live store:** https://colmacpulse.com
 
 This repo hosts the storefront — a single `index.html`. The tools themselves are sold as digital downloads on Lemon Squeezy.
 
