@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/28853971/README.md)
 # COLMAC TOOLWORKS
 
 Offline single-file tools you own. No cloud, no install, no subscription — nothing leaves your machine. Buy once, keep forever, works with no internet.
@@ -9,10 +8,11 @@ This repo hosts the storefront — a single `index.html`. The tools themselves a
 
 ## What's on the shelf
 
-- **The Engines** — file tools for organizing, packaging, finding, and cleaning up files: Thought Vault, MAG DUMP, Batch Prep, Dropzone Action, Downloads Engine, Local Retrieval, Repo Alignment, Text Normalization.
+- **The Engines** — file tools for organizing, packaging, finding, and cleaning up files: Thought Vault, Batch Prep, Dropzone Action, Downloads Engine, Local Retrieval, Repo Alignment, Text Normalization, True Diff, Truthsource.
 - **Field Scopes** — scored diagnosis tools for the trades, each with a customer-ready proof packet: Lawn, HVAC, Electrical, Leak, Pool, Ground & Drainage, Surface.
 - **VIRIDENCE** — plant lifecycle deviation engine. Reads a grow as behavior over time: gold-run baseline, deviation strip, 0 to 5 severity. Includes a live demo.
-- **Operator Pack** — all eight engines in one purchase.
+- **The Writers' Bench** — tools for the script: StoryForge, Character Capsule Builder, Writer's Room, SignalScript, Script Surgeon, Authorprint, Mag Dump, Mag Finder.
+- **Operator Pack** — all nine file engines in one purchase. **Writers' Bench pack** — all eight writing tools.
 
 ## Why offline
 
