@@ -372,8 +372,16 @@ const ENGINES = [
   {name:"TRUTHSOURCE", sub:"Seal a set of files so anyone can verify nothing was altered after the fact.", price:"$49", a:"#f59e0b", buy:""},
 ];
 const SCOPES = [
-  {name:"LAWNSCOPE",    sub:"Scored lawn & turf diagnosis, with a customer-ready proof packet.", price:"$49", a:"#5ee672", buy:""},
-  {name:"HVACSCOPE",    sub:"Scored HVAC field diagnosis and proof.", price:"$49", demo:"hvacscope-demo.html", a:"#22d3ee", buy:""},
+  {name:"LAWNSCOPE",    sub:"Scored lawn & turf diagnosis, with a customer-ready proof packet.", price:"$49", a:"#5ee672", buy:"",
+   v:"v1", sev:2, tag:"Lawn & turf diagnosis with proof",
+   long:"LAWNSCOPE scores lawn and turf condition in the field and builds a customer-ready proof packet. Walk the yard, capture what you see, and turn it into a scored readout the customer can hold, instead of a verbal estimate.",
+   solves:"Lawn-care quotes live or die on trust. LAWNSCOPE gives you a scored, documented diagnosis so the customer sees the problem and the severity before you ever name a price.",
+   caps:["Scored lawn & turf diagnosis","Customer-ready proof packet","0 to 5 severity read","Offline, single file"]},
+  {name:"HVACSCOPE",    sub:"Scored HVAC field diagnosis and proof.", price:"$49", demo:"hvacscope-demo.html", a:"#22d3ee", buy:"",
+   v:"v2.6", sev:3, tag:"HVAC field diagnosis and proof",
+   long:"HVACSCOPE scores an HVAC system in the field and produces a customer-ready proof packet on the spot. Capture the condition, let it score severity against baseline, and hand the homeowner a clear, defensible readout instead of a verbal guess.",
+   solves:"Trades lose jobs to vague verbal diagnoses the customer cannot see or trust. HVACSCOPE turns a field check into a scored, documented proof packet that closes the gap between what you found and what they believe.",
+   caps:["Scored field diagnosis against baseline","Customer-ready proof packet","0 to 5 severity read","Offline, single file, JSON export"]},
   {name:"ELECTROSCOPE", sub:"Scored electrical diagnosis field tool.", price:"$49", a:"#ffb000", buy:""},
   {name:"LEAKSCOPE",    sub:"Scored leak diagnosis and proof.", price:"$49", a:"#4d9bff", buy:""},
   {name:"POOLSCOPE",    sub:"Scored pool diagnosis and proof.", price:"$49", a:"#06d6c4", buy:""},
@@ -386,7 +394,11 @@ const SCOPES = [
   {name:"CABINETSCOPE", sub:"Scored cabinet & millwork condition diagnosis and proof.", price:"$49", a:"#c89a5a", buy:""},
 ];
 const VIRIDENCE = [
-  {name:"VIRIDENCE", sub:"Read the grow as behavior over time. A lifecycle deviation strip with a gold-run baseline and a 0 to 5 severity read. Offline, single file.", price:"$49", demo:"viridence-demo.html", a:"#5fe0cb", buy:""},
+  {name:"VIRIDENCE", sub:"Read the grow as behavior over time. A lifecycle deviation strip with a gold-run baseline and a 0 to 5 severity read. Offline, single file.", price:"$49", demo:"viridence-demo.html", a:"#5fe0cb", buy:"",
+   v:"v1", arc:"signal", sev:4, tag:"Plant lifecycle deviation scanner",
+   long:"VIRIDENCE reads a plant the way an experienced grower does: as a story over time, not a single snapshot. Load a reference sequence as your Gold Run and it builds a lifecycle signature across six behavior signals. Run a new sequence against it and the deviation ribbon shows exactly where this run tracks clean and where it drifts, with a match percentage and a 0 to 5 severity.",
+   solves:"You cannot tell from one photo whether a plant is fine, stressed, or recovering. VIRIDENCE turns a sequence of shots into a readable trend, so you catch drift early and know where to look, without pretending to diagnose from a single frame.",
+   caps:["Six-signal behavior read: HOLD, PUSH, REACH, TENSION, BREAK, RECOVER","Gold-run baseline plus a frame-by-frame deviation ribbon","Match percentage and a 0 to 5 deviation severity","JSON export, fully offline, single file"]},
 ];
 const FILMPACK = { name:"The Writers' Bench", sub:"All five writing tools, one purchase. $149 instead of $295 separately.", price:"$149", buy:"" };
 const FILM = [
@@ -425,7 +437,8 @@ const SPECTRUM = ENGINES.map(e=>e.a);
 const priceHTML = p => `<span class="cur">$</span>${p.replace('$','')}`;
 const buyAttrs = u => u ? `href="${u}" target="_blank" rel="noopener"` :
   `href="#" class="pending" title="Add this product's Lemon Squeezy checkout link in the config"`;
-const card = p => `<div class="card" style="--a:${p.a}">
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+const card = p => `<div class="card" style="--a:${p.a}" data-spot="${slug(p.name)}">
     <div class="cname">${p.name}</div><div class="csub">${p.sub}</div>
     <div class="cfoot"><span class="price">${priceHTML(p.price)}</span>
       <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
@@ -535,6 +548,121 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     if(e.target.closest && (e.target.closest('.dm-close') || e.target.classList.contains('dm-back'))) closeD();
   });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && m.classList.contains('open')) closeD(); });
+})();
+</script>
+<style id="spot-css">
+  .card[data-spot]{cursor:pointer}
+  .spot{position:fixed;inset:0;z-index:1100;display:none}
+  .spot.open{display:block}
+  .spot-back{position:absolute;inset:0;background:rgba(2,6,10,.82);backdrop-filter:blur(4px)}
+  .spot-box{position:absolute;inset:clamp(8px,3vw,40px);background:#070b0f;border:1px solid var(--line);border-radius:16px;overflow-y:auto;overflow-x:hidden;box-shadow:0 30px 90px rgba(0,0,0,.7)}
+  .spot-bar{position:sticky;top:0;z-index:5;background:rgba(7,11,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px clamp(16px,3vw,34px)}
+  .spot-ret{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:#0c1218;border:1px solid var(--line);color:var(--ink);padding:9px 16px;border-radius:9px;cursor:pointer;font-weight:700;line-height:1}
+  .spot-ret:hover{border-color:var(--a);color:var(--a)}
+  .spot-inner{padding:clamp(16px,3vw,34px);max-width:980px;margin:0 auto}
+  .rp{position:relative;border:1px solid var(--line);border-radius:16px;background:radial-gradient(circle at 50% -10%,#0e1620,#070b0f 62%);padding:clamp(20px,3.4vw,40px) clamp(18px,3vw,36px)}
+  .rp .crn{position:absolute;width:24px;height:24px;border:2px solid var(--a);opacity:.55}
+  .rp .crn.tl{top:12px;left:12px;border-right:0;border-bottom:0}
+  .rp .crn.tr{top:12px;right:12px;border-left:0;border-bottom:0}
+  .rp .crn.bl{bottom:12px;left:12px;border-right:0;border-top:0}
+  .rp .crn.br{bottom:12px;right:12px;border-left:0;border-top:0}
+  .rp-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.32em;color:var(--a);font-weight:700}
+  .rp-mark{font-size:clamp(40px,8vw,82px);font-weight:800;letter-spacing:-.02em;line-height:.95;margin:8px 0 0;color:var(--ink)}
+  .rp-tagrow{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+  .rp-badge{font-family:var(--mono);font-size:13px;border:1px solid var(--a);color:var(--a);border-radius:999px;padding:4px 14px;font-weight:700}
+  .rp-tag{color:var(--dim);font-size:clamp(15px,2vw,20px)}
+  .rp-img{width:100%;border-radius:12px;display:block;margin-top:16px}
+  .rp-readout{margin-top:24px;border:1px solid var(--line);border-radius:12px;background:#05080b;padding:16px}
+  .rp-rolabel{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--a);margin-bottom:12px}
+  .rp-bcrow{display:flex;align-items:center;gap:14px;margin-bottom:12px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim)}
+  .rp-bcrow .lbl{display:flex;align-items:center;gap:6px}
+  .rp-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .rp-ribbon{display:flex;height:72px;gap:2px;align-items:flex-end}
+  .rp-cell{flex:1;align-self:stretch;display:flex;align-items:flex-end}
+  .rp-cell i{display:block;width:100%;border-radius:3px 3px 0 0}
+  .rp-status{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:8px}
+  .rp-status.bad{color:#ff6961;background:rgba(255,105,97,.1);border:1px solid rgba(255,105,97,.32)}
+  .rp-status.ok{color:#64d98b;background:rgba(100,217,139,.1);border:1px solid rgba(100,217,139,.32)}
+  .rp-sev{margin-top:22px}
+  .rp-sevlabel{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--dim);margin-bottom:10px}
+  .rp-sevbar{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .rp-seg{position:relative;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:14px;color:#06090c}
+  .rp-seg.off{background:#0c1218;color:var(--dim);border:1px solid var(--line)}
+  .rp-seg .ptr{position:absolute;top:-13px;left:50%;transform:translateX(-50%);color:var(--ink);font-size:11px}
+  .rp-chips{display:flex;flex-wrap:wrap;gap:16px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+  .rp-chip{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13px}
+  .rp-chip b{color:var(--ink);font-weight:600}
+  .spot-copy h3{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--a);margin:26px 0 8px}
+  .spot-copy p{color:#c4d2dc;font-size:15px;line-height:1.65;margin:0}
+  .spot-caps{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:8px}
+  .spot-caps li{position:relative;padding-left:20px;color:#c4d2dc;font-size:14px}
+  .spot-caps li::before{content:"\25B8";position:absolute;left:0;color:var(--a)}
+  .spot-demo{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#05080b;margin-top:8px}
+  .spot-demo iframe{width:100%;height:560px;border:0;display:block}
+  .spot-buyrow{display:flex;align-items:center;gap:18px;margin-top:30px;flex-wrap:wrap}
+  .spot-price{font-size:30px;font-weight:800}.spot-price .cur{color:var(--a)}
+</style>
+<div id="spot" class="spot" aria-hidden="true">
+  <div class="spot-back"></div>
+  <div class="spot-box"><div class="spot-bar"><button type="button" class="spot-ret" aria-label="Back to store">&larr; Back</button></div><div class="spot-inner" id="spot-inner"></div></div>
+</div>
+<script>
+(function(){
+  var sp=document.getElementById('spot'), inner=document.getElementById('spot-inner');
+  if(!sp||!inner) return;
+  var MAP={};
+  try{ [].concat(ENGINES,SCOPES,VIRIDENCE,FILM).forEach(function(p){ MAP[slug(p.name)]=p; }); }catch(e){}
+  var SCALE=['#3fb950','#86c43a','#f0c043','#f08a24','#f0473e','#d6342b'];
+  var SIGNAL={HOLD:'#4f7f54',PUSH:'#74e36b',REACH:'#4f8dff',TENSION:'#ffd35b',BREAK:'#ff4e4e',RECOVER:'#4fd6bf'};
+  var SIGARC=[['HOLD',.5],['PUSH',.8],['PUSH',.9],['REACH',.85],['REACH',.95],['PUSH',.7],['TENSION',.8],['TENSION',.92],['BREAK',1],['BREAK',.9],['RECOVER',.8],['RECOVER',.95],['PUSH',.7],['HOLD',.55]];
+  function mix(a,b,t){function h(x){return [parseInt(x.slice(1,3),16),parseInt(x.slice(3,5),16),parseInt(x.slice(5,7),16)];}var A=h(a),B=h(b);return '#'+[0,1,2].map(function(i){var v=Math.round(A[i]+(B[i]-A[i])*t);return ('0'+v.toString(16)).slice(-2);}).join('');}
+  function ribbon(p){
+    var sev=(typeof p.sev==='number')?p.sev:3, out='';
+    if(p.arc==='signal'){
+      SIGARC.forEach(function(s){out+='<div class="rp-cell"><i style="height:'+Math.round(38+62*s[1])+'%;background:'+SIGNAL[s[0]]+';opacity:'+(0.5+0.5*s[1]).toFixed(2)+'"></i></div>';});
+    } else {
+      var N=28;
+      for(var i=0;i<N;i++){var frac=i/(N-1),drift=Math.min(1,frac*(sev/5)*1.5),col=mix('#3fb950','#f0473e',drift),hh=42+48*(0.4+0.6*Math.abs(Math.sin(i*0.7)));
+        out+='<div class="rp-cell"><i style="height:'+Math.round(hh)+'%;background:'+col+';opacity:'+(0.55+0.4*drift).toFixed(2)+'"></i></div>';}
+    }
+    return out;
+  }
+  function sevbar(p){var sev=(typeof p.sev==='number')?p.sev:3,out='';for(var i=0;i<6;i++){out+= i<=sev ? '<div class="rp-seg" style="background:'+SCALE[i]+'">'+(i===sev?'<span class="ptr">\u25BC</span>':'')+i+'</div>' : '<div class="rp-seg off">'+i+'</div>';}return out;}
+  function panel(p){
+    var sev=(typeof p.sev==='number')?p.sev:3, bad=sev>=3;
+    var head='<div class="crn tl"></div><div class="crn tr"></div><div class="crn bl"></div><div class="crn br"></div><div class="rp-eyebrow">A COLMACPULSE TOOL</div>';
+    if(p.render){ return '<div class="rp">'+head+'<img class="rp-img" src="'+p.render+'" alt="'+p.name+'"></div>'; }
+    return '<div class="rp">'+head+
+      '<div class="rp-mark">'+p.name+'</div>'+
+      '<div class="rp-tagrow">'+(p.v?'<span class="rp-badge">'+p.v+'</span>':'')+'<span class="rp-tag">'+(p.tag||p.sub||'')+'</span></div>'+
+      '<div class="rp-readout"><div class="rp-rolabel">DEVIATION READOUT</div>'+
+        '<div class="rp-bcrow"><span class="lbl"><i class="rp-dot" style="background:#3fb950"></i>BASELINE</span><span style="color:var(--a)">\u2192 \u0394 \u2192</span><span class="lbl"><i class="rp-dot" style="background:#f0473e"></i>CURRENT</span></div>'+
+        '<div class="rp-ribbon">'+ribbon(p)+'</div>'+
+        '<div class="rp-status '+(bad?'bad':'ok')+'">'+(bad?'\u26A0 DEVIATIONS DETECTED':'\u2713 WITHIN BASELINE')+'</div></div>'+
+      '<div class="rp-sev"><div class="rp-sevlabel">SEVERITY</div><div class="rp-sevbar">'+sevbar(p)+'</div></div>'+
+      '<div class="rp-chips"><span class="rp-chip"><i class="rp-dot" style="background:var(--a)"></i><b>Offline</b></span><span class="rp-chip"><i class="rp-dot" style="background:var(--a)"></i><b>Baseline vs Current</b></span><span class="rp-chip"><i class="rp-dot" style="background:var(--a)"></i><b>Severity 0-5</b></span><span class="rp-chip"><i class="rp-dot" style="background:var(--a)"></i><b>JSON Export</b></span></div>'+
+    '</div>';
+  }
+  function caps(p){ return (p.caps&&p.caps.length)? '<h3>What you get</h3><ul class="spot-caps">'+p.caps.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul>':''; }
+  function buy(p){var a=p.buy?('href="'+p.buy+'" target="_blank" rel="noopener"'):'href="#" class="pending"';return '<a class="buy" style="--a:'+p.a+'" '+a+'>'+(p.buy?'Get it \u2192':'Link pending')+'</a>';}
+  function open(p){
+    sp.style.setProperty('--a', p.a||'#9fe8d4');
+    var demo=p.demo?'<h3>Live demo</h3><div class="spot-demo"><iframe id="spotFrame" title="'+p.name+' demo" src="'+p.demo+'"></iframe></div>':'';
+    inner.innerHTML=panel(p)+'<div class="spot-copy"><h3>What it does</h3><p>'+(p.long||p.sub||'')+'</p>'+
+      (p.solves?'<h3>What it solves</h3><p>'+p.solves+'</p>':'')+caps(p)+demo+
+      '<div class="spot-buyrow"><span class="spot-price"><span class="cur">$</span>'+(p.price||'').replace('$','')+'</span>'+buy(p)+'</div></div>';
+    sp.classList.add('open'); sp.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+    var b=sp.querySelector('.spot-box'); if(b)b.scrollTop=0;
+  }
+  function close(){ sp.classList.remove('open'); sp.setAttribute('aria-hidden','true'); var f=document.getElementById('spotFrame'); if(f)f.src='about:blank'; inner.innerHTML=''; document.body.style.overflow=''; }
+  document.addEventListener('click', function(e){
+    if(!e.target.closest) return;
+    if(e.target.closest('.buy')||e.target.closest('.try')) return;
+    var card=e.target.closest('.card[data-spot]');
+    if(card){ var p=MAP[card.getAttribute('data-spot')]; if(p){ e.preventDefault(); open(p); } return; }
+    if(e.target.closest('.spot-ret')||e.target.classList.contains('spot-back')) close();
+  });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'&&sp.classList.contains('open')) close(); });
 })();
 </script>
 </body>
