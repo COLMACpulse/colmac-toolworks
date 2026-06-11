@@ -693,7 +693,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
 (function(){
   var sp=document.getElementById('spot'), inner=document.getElementById('spot-inner');
   if(!sp||!inner) return;
-  var MAP={};
+  var MAP={}, CUR=null;
   try{ [].concat(ENGINES,SCOPES,VIRIDENCE,FILM).forEach(function(p){ MAP[slug(p.name)]=p; }); }catch(e){}
   var SCALE=['#3fb950','#86c43a','#f0c043','#f08a24','#f0473e','#d6342b'];
   var SIGNAL={HOLD:'#4f7f54',PUSH:'#74e36b',REACH:'#4f8dff',TENSION:'#ffd35b',BREAK:'#ff4e4e',RECOVER:'#4fd6bf'};
@@ -714,7 +714,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   function panel(p){
     var sev=(typeof p.sev==='number')?p.sev:3, bad=sev>=3;
     var head='<div class="crn tl"></div><div class="crn tr"></div><div class="crn bl"></div><div class="crn br"></div><div class="rp-eyebrow">A COLMACPULSE TOOL</div>';
-    if(p.render){ return '<div class="rp rp-imgmode"><img class="rp-img" src="'+p.render+'" alt="'+p.name+'"></div>'; }
+    if(p.render){ return '<div class="rp rp-imgmode"><img class="rp-img" src="'+p.render+'" alt="'+p.name+'" onerror="window.__spotFail&&window.__spotFail(this)"></div>'; }
     return '<div class="rp">'+head+
       '<div class="rp-mark">'+p.name+'</div>'+
       '<div class="rp-tagrow">'+(p.v?'<span class="rp-badge">'+p.v+'</span>':'')+'<span class="rp-tag">'+(p.tag||p.sub||'')+'</span></div>'+
@@ -728,7 +728,14 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   }
   function caps(p){ return (p.caps&&p.caps.length)? '<h3>What you get</h3><ul class="spot-caps">'+p.caps.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul>':''; }
   function buy(p){var a=p.buy?('href="'+p.buy+'" target="_blank" rel="noopener"'):'href="#" class="pending"';return '<a class="buy" style="--a:'+p.a+'" '+a+'>'+(p.buy?'Get it \u2192':'Link pending')+'</a>';}
+  function failPanel(p){
+    var head='<div class="crn tl"></div><div class="crn tr"></div><div class="crn bl"></div><div class="crn br"></div><div class="rp-eyebrow">A COLMACPULSE TOOL</div>';
+    return '<div class="rp">'+head+'<div class="rp-mark">'+p.name+'</div>'+
+      '<div class="rp-tagrow">'+(p.v?'<span class="rp-badge">'+p.v+'</span>':'')+'<span class="rp-tag">'+(p.tag||p.sub||'')+'</span></div></div>';
+  }
+  window.__spotFail=function(img){ try{ var box=img&&img.closest?img.closest('.rp'):null; if(box&&CUR){ box.outerHTML=failPanel(CUR); } }catch(e){} };
   function open(p){
+    CUR=p;
     sp.style.setProperty('--a', p.a||'#9fe8d4');
     var demo=p.demo?'<h3>Live demo</h3><div class="spot-demo"><iframe id="spotFrame" title="'+p.name+' demo" src="'+p.demo+'"></iframe></div>':'';
     inner.innerHTML=panel(p)+'<div class="spot-copy"><h3>What it does</h3><p>'+(p.long||p.sub||'')+'</p>'+
