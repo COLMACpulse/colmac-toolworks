@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AUTHORPRINT — Offline Author Voice Engine</title>
+<style>
+  :root{
+    --bg:#0f1115;--panel:#171b22;--panel2:#202633;--text:#eef2f7;--muted:#9aa6b2;
+    --line:#303846;--good:#7ee787;--warn:#ffd166;--bad:#ff6b6b;--accent:#8ab4ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);background:#11141a;display:flex;gap:14px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+  h1{margin:0;font-size:22px;letter-spacing:.08em}.tag{color:var(--muted);font-size:13px}.pill{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--good);font-size:12px}
+  main{display:grid;grid-template-columns:1fr 360px 1fr;gap:14px;padding:14px;min-height:calc(100vh - 75px)}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:680px}
+  .head{padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel2);font-weight:700;display:flex;justify-content:space-between;gap:8px;align-items:center}.sub{font-weight:400;color:var(--muted);font-size:12px}
+  textarea{width:100%;flex:1;background:#0d1016;color:var(--text);border:0;resize:none;padding:14px;font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;outline:none}
+  .controls{padding:14px;display:grid;gap:12px;overflow:auto}.row{display:grid;gap:6px}.row label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+  input[type=range]{width:100%}select,button,input[type=text]{background:#0d1016;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:14px}button{cursor:pointer;background:#243044;font-weight:700}button:hover{border-color:var(--accent)}.primary{background:#27415f;border-color:#39628e}.danger{background:#3b2226;border-color:#6b3138}.small{font-size:12px;padding:7px 9px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .scorebox{border:1px solid var(--line);border-radius:12px;padding:10px;background:#111620}.metric{display:flex;justify-content:space-between;border-bottom:1px solid #252d39;padding:6px 0;font-size:13px}.metric:last-child{border-bottom:0}.num{font-variant-numeric:tabular-nums}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}.muted{color:var(--muted)}
+  .tokens{display:flex;flex-wrap:wrap;gap:6px}.tok{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:5px 8px;background:#0d1016;color:#cbd5e1}.warnline{font-size:12px;padding:7px 8px;border-radius:8px;background:#251d12;color:var(--warn);border:1px solid #59451d;margin:4px 0}.okline{font-size:12px;padding:7px 8px;border-radius:8px;background:#102617;color:var(--good);border:1px solid #264f32;margin:4px 0}.badline{font-size:12px;padding:7px 8px;border-radius:8px;background:#2b1418;color:var(--bad);border:1px solid #653039;margin:4px 0}
+  footer{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;background:#11141a}.outwrap{display:flex;flex-direction:column;flex:1}.note{font-size:12px;color:var(--muted);line-height:1.35}.kbd{font-family:ui-monospace,monospace;background:#0d1016;border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+  @media(max-width:1100px){main{grid-template-columns:1fr}section{min-height:460px}}
+</style>
+</head>
+<body>
+<style>
+  .demo-bar{position:sticky;top:0;z-index:9999;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    justify-content:space-between;padding:12px clamp(14px,3vw,24px);background:linear-gradient(180deg,#1b232e,#141a22);
+    border-bottom:1px solid #2a3340;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .demo-bar .demo-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+  .demo-tag{font-size:11px;font-weight:800;letter-spacing:.16em;color:#0b0e12;background:#8ab4ff;padding:4px 9px;border-radius:6px;white-space:nowrap}
+  .demo-msg{font-size:13px;color:#9aa6b2;line-height:1.4}
+  .demo-msg b{color:#e8ecf1;font-weight:600}
+  .demo-cta{font-size:13px;font-weight:800;color:#0b0e12;background:#7ee787;padding:10px 18px;border-radius:8px;
+    text-decoration:none;white-space:nowrap;transition:transform .15s,filter .15s}
+  .demo-cta:hover{filter:brightness(1.06)}
+</style>
+<div class="demo-bar">
+  <div class="demo-left"><span class="demo-tag">LIVE DEMO</span><span class="demo-msg">The real voice engine, running live. <b>The file you buy runs offline forever — export your cleaned draft and your portable voice profile.</b></span></div>
+  <a class="demo-cta" id="buyBtn" href="#" data-href="">Get the file — $49</a>
+</div>
+<header>
+  <div><h1>AUTHORPRINT</h1><div class="tag">Finite calibration. Local profile. Human signal scoring. No network by design.</div></div>
+  <div class="pill">LOCAL ONLY • RULE ENGINE • NO TELEMETRY</div>
+</header>
+<main>
+  <section>
+    <div class="head">1. Root Signal Calibration <span class="sub">paste finite human-origin samples</span></div>
+    <textarea id="calibration" placeholder="Paste 5k–20k words if available. Real user-origin writing only: emails, notes, journals, technical explanations, rants, transcripts. The system extracts character geometry, not the soul."></textarea>
+    <footer>
+      <button class="primary" id="buildProfile">Build / Refresh Profile</button>
+      <button id="loadDemo">Load Tiny Demo</button>
+      <button class="danger" id="clearCal">Clear Root Text</button>
+    </footer>
+  </section>
+
+  <section>
+    <div class="head">2. Author Field <span class="sub">profile + controls</span></div>
+    <div class="controls">
+      <div class="row"><label>Profile Name</label><input id="profileName" type="text" value="my_author_profile" /></div>
+      <div class="row"><label>Mode</label><select id="mode"><option>No-Fluff</option><option>Clean Human</option><option>Technical</option><option>Email</option><option>Founder</option><option>Compressed</option><option>Raw Notes</option><option>Legal-Safe</option><option>Story</option></select></div>
+      <div class="row"><label>Human Signal Strength <span id="vStrength">70</span></label><input id="strength" type="range" min="0" max="100" value="70"></div>
+      <div class="row"><label>Compression <span id="vCompression">55</span></label><input id="compression" type="range" min="0" max="100" value="55"></div>
+      <div class="row"><label>Directness <span id="vDirect">70</span></label><input id="direct" type="range" min="0" max="100" value="70"></div>
+      <div class="row"><label>Cadence Variance <span id="vCadence">60</span></label><input id="cadence" type="range" min="0" max="100" value="60"></div>
+      <div class="row"><label>Symbol Density <span id="vSymbol">35</span></label><input id="symbolDensity" type="range" min="0" max="100" value="35"></div>
+      <div class="row"><label>AI Sludge Suppression <span id="vSludge">80</span></label><input id="sludge" type="range" min="0" max="100" value="80"></div>
+      <div class="grid2"><button class="primary" id="rewrite">Rewrite Draft</button><button id="scoreOnly">Score Only</button></div>
+      <div class="grid2"><button id="copyOut">Copy Output</button><button id="downloadOut">Export TXT</button></div>
+      <div class="grid2"><button id="downloadProfile">Export Profile JSON</button><button class="danger" id="wipeAll">Wipe All</button></div>
+
+      <div class="scorebox"><b>Calibration</b><div id="profileMetrics"></div></div>
+      <div class="scorebox"><b>Scores</b><div id="scores"></div></div>
+      <div class="scorebox"><b>Detected Symbols</b><div class="tokens" id="symbols"></div></div>
+      <div class="scorebox"><b>Warnings</b><div id="warnings"></div></div>
+      <div class="note">Rule v1 intentionally does not call a model. This proves the local architecture: finite ingest → compressed profile → transform → score → export.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">3. Draft + Output <span class="sub">local transform workspace</span></div>
+    <div class="outwrap"><textarea id="draft" placeholder="Paste AI draft, rough note, email, or text to transform through the local AUTHORPRINT profile."></textarea></div>
+    <div class="head">Output <span class="sub">rewritten locally</span></div>
+    <div class="outwrap"><textarea id="output" placeholder="Output appears here."></textarea></div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const stop=new Set(('the a an and or but if then to of in on for with from as is are was were be been being this that those these it its i you he she they we my your our their me him her them at by not no yes do does did can could would should will just very really into about after before over under again also so because while where when how what why who').split(' '));
+let PROFILE=null;
+function words(t){return (t.toLowerCase().match(/[a-z0-9']+/g)||[])}
+function sentences(t){return t.split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(Boolean)}
+function paragraphs(t){return t.split(/\n\s*\n+/).map(p=>p.trim()).filter(Boolean)}
+function clamp(n,a=0,b=100){return Math.max(a,Math.min(b,n))}
+function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
+function variance(a){let m=avg(a);return a.length?avg(a.map(x=>(x-m)**2)):0}
+function topSymbols(t){let ws=words(t).filter(w=>w.length>4&&!stop.has(w));let m={};ws.forEach(w=>m[w]=(m[w]||0)+1);return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,24).map(([term,count])=>({term,count}))}
+function analyze(t){let ws=words(t), ss=sentences(t), ps=paragraphs(t);let sl=ss.map(s=>words(s).length);let punct=(t.match(/[.,;:!?—–-]/g)||[]);let em=(t.match(/[—–]/g)||[]).length;let hy=(t.match(/--/g)||[]).length;let trans=(t.match(/\b(however|moreover|ultimately|additionally|furthermore|in conclusion|overall|therefore|thus|crucial|delve|elevate)\b/gi)||[]).length;let triads=(t.match(/\b\w+,\s+\w+,\s+(and|or)\s+\w+/g)||[]).length;let fragments=ss.filter(s=>words(s).length<=5).length;let long=ss.filter(s=>words(s).length>=28).length;let sym=Math.abs(avg(sl)-16)+Math.max(0, 15-Math.sqrt(variance(sl)));let generic=trans*3+triads*2+em*1.8+hy*1.5;let paraLens=ps.map(p=>words(p).length);return {wordCount:ws.length,sentenceCount:ss.length,paragraphCount:ps.length,meanSentence:+avg(sl).toFixed(2),sentenceVariance:+variance(sl).toFixed(2),fragmentRate:ss.length?fragments/ss.length:0,longRate:ss.length?long/ss.length:0,paragraphAsym:+variance(paraLens).toFixed(2),punctDensity:ws.length?punct.length/ws.length:0,emDashCount:em, doubleDashCount:hy,transitionLoad:trans,triads,aiPatternLoad:clamp(generic+sym),symbols:topSymbols(t)} }
+function buildProfile(){let t=$('calibration').value.trim();let a=analyze(t);let W=clamp((a.wordCount/5000)*100);let V=clamp((a.paragraphCount/8)*35+(a.sentenceVariance/60)*35+(a.symbols.length/15)*30);let B=clamp(100-Math.abs(a.meanSentence-18)*2);let H=t?100:0;let ccf=clamp(.35*W+.25*V+.2*B+.2*H);PROFILE={profile_id:$('profileName').value||'my_author_profile',created:new Date().toISOString(),local_only:true,raw_corpus_retained:false,calibration:{word_count:a.wordCount,sample_variety:+(V/100).toFixed(2),behavioral_consistency:+(B/100).toFixed(2),human_origin_confidence:t?1:0,ccf:+(ccf/100).toFixed(2)},features:a,governance:{synthetic_recalibration_allowed:false,quirk_saturation_limit:0.18,drift_warning_threshold:0.25,profile_freeze_required:true},symbols:a.symbols};renderProfile();return PROFILE}
+function renderProfile(){let p=PROFILE||buildProfile();let c=p.calibration;let status=c.ccf<.4?'UNDERCALIBRATED':c.ccf<.7?'WEAK / USABLE':c.ccf<.85?'STABLE':'STRONG';$('profileMetrics').innerHTML=metric('Words',c.word_count)+metric('CCF',Math.round(c.ccf*100),c.ccf>.7?'good':c.ccf>.4?'warn':'bad')+metric('Variety',Math.round(c.sample_variety*100))+metric('Status',status,c.ccf>.7?'good':c.ccf>.4?'warn':'bad');$('symbols').innerHTML=(p.symbols||[]).slice(0,16).map(s=>`<span class="tok">${s.term} ${s.count}</span>`).join('')||'<span class="muted">No signal yet.</span>';}
+function metric(k,v,cls=''){return `<div class="metric"><span>${k}</span><span class="num ${cls}">${v}</span></div>`}
+function removeSludge(t){let reps=[[/\bIn conclusion,?\s*/gi,''],[/\bUltimately,?\s*/gi,''],[/\bMoreover,?\s*/gi,''],[/\bFurthermore,?\s*/gi,''],[/\bIt is important to note that\s*/gi,''],[/\bIn today'?s rapidly evolving\s+/gi,''],[/\bdelve into\b/gi,'get into'],[/\belevate\b/gi,'improve'],[/\bcrucial\b/gi,'important'],[/\s+—\s+/g,', '],[/--/g,',']];reps.forEach(([r,x])=>t=t.replace(r,x));return t}
+function compress(t,level){if(level<45)return t;let remove=['very','really','quite','rather','basically','simply','clearly','actually'];let re=new RegExp('\\b('+remove.join('|')+')\\b\\s*','gi');t=t.replace(re,'');if(level>70){t=t.replace(/\bthat\b\s*/gi,'');t=t.replace(/\s+/g,' ')}return t.trim()}
+function injectCadence(t,level){if(level<35)return t;let ss=sentences(t);let out=[];ss.forEach((s,i)=>{out.push(s);if(level>55 && i%4===1 && words(s).length>12) out.push('That matters.');if(level>75 && i%6===2) out.push('No fluff.');});return out.join('\n')}
+function injectSymbols(t,level){if(!PROFILE||level<25)return t;let sy=(PROFILE.symbols||[]).slice(0,5).map(x=>x.term);if(!sy.length)return t;let add= level>70?`\n\nSignal check: ${sy.slice(0,3).join(', ')}.`: level>45?`\n\nThe through-line is ${sy[0]}.`:'';return t+add}
+function modeShape(t,mode){if(mode==='Email'){return t.replace(/^/,'Hi,\n\n').replace(/$/,'\n\nBest,')}
+ if(mode==='Legal-Safe'){return t.replace(/\bguarantee\b/gi,'support').replace(/\bproof\b/gi,'supporting record')}
+ if(mode==='Compressed'){return sentences(t).slice(0,Math.max(3,Math.ceil(sentences(t).length*.65))).join(' ')}
+ if(mode==='Raw Notes'){return sentences(t).map(s=>'• '+s).join('\n')}
+ if(mode==='Technical'){return t.replace(/\n{3,}/g,'\n\n')+'\n\nOperational read: local, finite, governed.'}
+ return t}
+function rewrite(){if(!PROFILE)buildProfile();let t=$('draft').value.trim();let original=t;if(!t)return;let sludge=+$('sludge').value, comp=+$('compression').value, cad=+$('cadence').value, sym=+$('symbolDensity').value, direct=+$('direct').value;
+ if(sludge>30)t=removeSludge(t);t=compress(t,comp);if(direct>60)t=t.replace(/\bI think\b/gi,'I believe').replace(/\bmaybe\b/gi,'possibly');t=injectCadence(t,cad);t=injectSymbols(t,sym);t=modeShape(t,$('mode').value);$('output').value=t;score(original,t)}
+function score(input,out){if(!PROFILE)buildProfile();let a=analyze(out||$('draft').value), root=PROFILE.features, ccf=PROFILE.calibration.ccf;let C=clamp((Math.sqrt(a.sentenceVariance)*7)+a.fragmentRate*50+a.paragraphAsym/20);let S=clamp((a.symbols.filter(s=>PROFILE.symbols.some(r=>r.term===s.term)).length/8)*100);let K=clamp(100-Math.abs(a.meanSentence-root.meanSentence)*4);let R=clamp(a.paragraphAsym?Math.sqrt(a.paragraphAsym)*8:35);let E=clamp((a.fragmentRate+a.longRate)*100);let qUse=S/100;let qMax=PROFILE.governance.quirk_saturation_limit+(+$('symbolDensity').value/100)*.25;let penaltyQ=clamp(Math.max(0,qUse-qMax)**2*100);let HSI=clamp(((C+S+K+R+E)/5)*ccf-a.aiPatternLoad*.45-penaltyQ*.4);let fit=clamp(100-Math.abs(a.meanSentence-root.meanSentence)*3-Math.abs(Math.sqrt(a.sentenceVariance)-Math.sqrt(root.sentenceVariance))*2);let sf=clamp((HSI/Math.max(1,70))*100*ccf);let drift=clamp(100-sf);let apl=a.aiPatternLoad;$('scores').innerHTML=metric('HSI',Math.round(HSI),HSI>70?'good':HSI>45?'warn':'bad')+metric('APL',Math.round(apl),apl<35?'good':apl<60?'warn':'bad')+metric('FIT',Math.round(fit),fit>70?'good':fit>45?'warn':'bad')+metric('SF',Math.round(sf),sf>70?'good':sf>45?'warn':'bad')+metric('DRIFT',Math.round(drift),drift<25?'good':drift<55?'warn':'bad')+metric('QSP',Math.round(penaltyQ),penaltyQ<15?'good':penaltyQ<35?'warn':'bad');renderWarnings(HSI,apl,fit,sf,drift,penaltyQ)}
+function renderWarnings(HSI,APL,FIT,SF,DRIFT,QSP){let arr=[];let ccf=PROFILE.calibration.ccf;if(ccf<.4)arr.push(['badline','UNDERCALIBRATED: add more human-origin root signal.']);else if(ccf<.7)arr.push(['warnline','WEAK CALIBRATION: usable, but not stable.']);else arr.push(['okline','PROFILE STABLE: enough signal for v1 transform.']);if(APL>55)arr.push(['warnline','AI SLUDGE HIGH: reduce polish, transitions, and symmetry.']);if(QSP>25)arr.push(['warnline','QUIRK SATURATION: author texture is getting parody-risk.']);if(DRIFT>55)arr.push(['badline','DRIFT RISK: return to root signal. Do not recalibrate from generated output.']);if(FIT<45)arr.push(['warnline','LOW PROFILE FIT: output sits outside calibrated range.']);if(!arr.length)arr.push(['okline','No major warnings.']);$('warnings').innerHTML=arr.map(([c,x])=>`<div class="${c}">${x}</div>`).join('')}
+function download(name,text,type='text/plain'){let b=new Blob([text],{type});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+['strength','compression','direct','cadence','symbolDensity','sludge'].forEach(id=>$(id).addEventListener('input',()=>{$('v'+({strength:'Strength',compression:'Compression',direct:'Direct',cadence:'Cadence',symbolDensity:'Symbol',sludge:'Sludge'}[id])).textContent=$(id).value}));
+$('buildProfile').onclick=buildProfile;$('rewrite').onclick=rewrite;$('scoreOnly').onclick=()=>score($('draft').value,$('output').value||$('draft').value);$('clearCal').onclick=()=>{$('calibration').value='';buildProfile()};$('wipeAll').onclick=()=>{localStorage.clear();['calibration','draft','output'].forEach(id=>$(id).value='');PROFILE=null;buildProfile()};$('downloadProfile').onclick=()=>{if(!PROFILE)buildProfile();download((PROFILE.profile_id||'authorprint_profile')+'.json',JSON.stringify(PROFILE,null,2),'application/json')};$('downloadOut').onclick=()=>download('authorprint_output.txt',$('output').value||'');$('copyOut').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText($('output').value||'');$('loadDemo').onclick=()=>{$('calibration').value='I write the way I think, which is in bursts. Short when it matters. Longer when I am working something out and need room to turn it over. I do not trust writing that sounds too smooth; the polish usually means somebody sanded the person off it. Keep the texture. Keep the odd word choices and the half-finished thoughts that still land. If a sentence feels like it came off an assembly line, cut it. Real writing has a rhythm and a few rough edges, and that is the part worth protecting.';buildProfile()};
+['calibration','draft','output'].forEach(id=>$(id).addEventListener('input',()=>localStorage.setItem('ap_'+id,$(id).value)));window.addEventListener('load',()=>{['calibration','draft','output'].forEach(id=>$(id).value=localStorage.getItem('ap_'+id)||'');buildProfile()});
+</script>
+<script>
+window.addEventListener('load', function(){
+
+  function bumpBuy(){var b=document.getElementById('buyBtn'); if(!b)return;
+    b.style.transform='scale(1.08)'; setTimeout(function(){b.style.transform='';},220);
+    b.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  function wireBuy(){var b=document.getElementById('buyBtn'); if(!b)return;
+    b.addEventListener('click',function(e){var h=b.getAttribute('data-href'); if(h){location.href=h;return;}
+      e.preventDefault(); var t=b.textContent; b.textContent='Checkout opens at launch';
+      setTimeout(function(){b.textContent=t;},1600);});}
+
+  function $(id){return document.getElementById(id);}
+  var SAMPLE="In today's fast-paced world, it's important to note that effective communication is, at the end of the day, absolutely essential. Whether you're a seasoned professional or just starting out, leveraging the right strategies can truly make all the difference. Moreover, it's worth considering that authenticity remains key — by embracing these principles, you'll be well on your way to unlocking your full potential and achieving the success you so richly deserve.";
+  try{
+    if($('loadDemo')) $('loadDemo').click();          // sample root voice + build profile
+    if($('draft')) $('draft').value=SAMPLE;            // sludgy AI draft to clean
+    if($('rewrite')) $('rewrite').click();             // de-sludge in-voice + score
+  }catch(e){}
+  if($('draft')) $('draft').maxLength=1600;
+  if($('calibration')) $('calibration').maxLength=2600;
+  function gate(e){ if(e&&e.preventDefault)e.preventDefault(); bumpBuy(); return false; }
+  if($('downloadOut')) $('downloadOut').onclick=gate;       // cleaned-text export = buy
+  if($('downloadProfile')) $('downloadProfile').onclick=gate; // portable voice profile = buy
+  wireBuy();
+});
+</script>
+</body>
+</html>

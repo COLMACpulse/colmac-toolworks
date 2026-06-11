@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HVACSCOPE v2.6 — Client Proof Mode</title>
+  <style>
+    :root{
+      --bg:#05080b; --card:#0f151b; --card2:#0b1015; --ink:#e8eef5; --muted:#8fa1b3;
+      --line:#1f2a33; --accent:#3da5d9; --accent2:#4caf7a; --warn:#ffb347; --bad:#ff6961; --ok:#64d98b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif}
+    .wrap{max-width:1400px;margin:0 auto}
+    h1{margin:0 0 6px;color:var(--accent)}
+    h3{margin-top:0}
+    .sub{color:var(--muted);margin-bottom:14px}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    label{display:block;font-weight:700;margin:8px 0 6px;color:#d5dde5}
+    input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--ink);font:inherit}
+    textarea{min-height:84px;resize:vertical}
+    button{border:0;border-radius:10px;padding:10px 14px;background:var(--accent);color:#031018;font-weight:700;cursor:pointer;margin-right:8px;margin-top:10px}
+    button.secondary{background:var(--accent2)}
+    button.ghost{background:#6b7280;color:white}
+    button.warn{background:var(--warn);color:#251300}
+    .section{margin-top:12px;padding:12px;background:var(--card2);border:1px solid var(--line);border-radius:12px}
+    .section h4{margin:0 0 8px;color:var(--accent)}
+    pre{white-space:pre-wrap;margin:0;font-size:14px;line-height:1.45}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#10171d;margin-right:8px;margin-bottom:8px;font-size:12px;font-weight:700}
+    .ok{color:var(--ok)} .warnTxt{color:var(--warn)} .bad{color:var(--bad)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border:1px solid var(--line);padding:8px;text-align:left;font-size:13px}
+    th{background:#10171d}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px}
+    .thumb{background:#0e1419;border:1px solid var(--line);border-radius:10px;padding:8px}
+    .thumb img{width:100%;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:#000}
+    .thumb .cap{font-size:12px;color:var(--muted);margin-top:6px;word-break:break-word}
+    audio{width:100%;margin-top:8px}
+    .small{font-size:13px;color:var(--muted)}
+    .captureBtns{display:flex;flex-wrap:wrap;gap:8px}
+    .hiddenInput{display:none}
+    .proofMode{background:#081017;border-color:#23404f}
+    .proofMode h4{color:#7cc7ee}
+    @media(min-width:1100px){
+      .grid{grid-template-columns:1.02fr .98fr}
+      .row.two{grid-template-columns:1fr 1fr}
+      .row.three{grid-template-columns:1fr 1fr 1fr}
+      .row.four{grid-template-columns:1fr 1fr 1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<style>
+  .demo-bar{position:sticky;top:0;z-index:9999;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    justify-content:space-between;padding:12px clamp(14px,3vw,24px);background:linear-gradient(180deg,#1b232e,#141a22);
+    border-bottom:1px solid #2a3340;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .demo-bar .demo-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+  .demo-tag{font-size:11px;font-weight:800;letter-spacing:.16em;color:#0b0e12;background:#3da5d9;padding:4px 9px;border-radius:6px;white-space:nowrap}
+  .demo-msg{font-size:13px;color:#9aa6b2;line-height:1.4}
+  .demo-msg b{color:#e8ecf1;font-weight:600}
+  .demo-cta{font-size:13px;font-weight:800;color:#0b0e12;background:#64d98b;padding:10px 18px;border-radius:8px;
+    text-decoration:none;white-space:nowrap;transition:transform .15s,filter .15s}
+  .demo-cta:hover{filter:brightness(1.06)}
+</style>
+<div class="demo-bar">
+  <div class="demo-left"><span class="demo-tag">LIVE DEMO</span><span class="demo-msg">Real scoring on a sample call. <b>The file you buy runs offline in the field — capture photos and audio, export the client proof packet.</b></span></div>
+  <a class="demo-cta" id="buyBtn" href="#" data-href="">Get the file — $49</a>
+</div>
+<div class="wrap">
+  <h1>🌬️ HVACSCOPE v2.6 — Client Proof Mode</h1>
+  <div class="sub">Field packet, evidence capture, scored diagnosis, and customer-facing proof output in one file.</div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Field Packet</h3>
+      <div class="row three">
+        <label>Customer Name
+          <input id="customerName" placeholder="Customer name" />
+        </label>
+        <label>Phone
+          <input id="customerPhone" placeholder="Phone" />
+        </label>
+        <label>Site / Address
+          <input id="siteAddress" placeholder="Address / site" />
+        </label>
+      </div>
+
+      <div class="row two">
+        <label>Customer-Reported Issue
+          <textarea id="customerNotes" placeholder="What the customer says is happening"></textarea>
+        </label>
+        <label>Technician Notes
+          <textarea id="techNotes" placeholder="What you observe on-site"></textarea>
+        </label>
+      </div>
+
+      <div class="row two">
+        <label>Action Taken
+          <textarea id="actionTaken" placeholder="What was done on-site"></textarea>
+        </label>
+        <label>Visual Evidence Notes
+          <textarea id="visualNotes" placeholder="Filter replaced, vents adjusted, coil cleaned, etc."></textarea>
+        </label>
+      </div>
+
+      <h3 style="margin-top:18px;">Technician Inputs</h3>
+      <div class="row two">
+        <label>Primary Complaint
+          <select id="complaint">
+            <option value="weak_airflow">Weak airflow</option>
+            <option value="uneven_temp">Uneven room temperatures</option>
+            <option value="poor_performance">Poor cooling / heating performance</option>
+            <option value="short_cycle">Short cycling</option>
+            <option value="long_runtime">Excessive runtime</option>
+          </select>
+        </label>
+
+        <label>Impact Area
+          <select id="zone">
+            <option value="single">Single room / zone</option>
+            <option value="multi">Multiple rooms</option>
+            <option value="whole">Whole system</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="row four">
+        <label>Filter Condition
+          <select id="filter">
+            <option value="unknown">Unknown</option>
+            <option value="clean">Clean</option>
+            <option value="dirty">Dirty / overdue</option>
+          </select>
+        </label>
+        <label>Vent / Duct Clues
+          <select id="duct">
+            <option value="none">No clear issue</option>
+            <option value="some_closed">Some vents closed / restricted</option>
+            <option value="blocked">Likely blockage / imbalance</option>
+          </select>
+        </label>
+        <label>Airflow Strength
+          <select id="airflow">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="strong">Strong</option>
+          </select>
+        </label>
+        <label>Noise
+          <select id="noise">
+            <option value="none">None</option>
+            <option value="mild">Mild / noticeable</option>
+            <option value="abnormal">Abnormal / concerning</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="row four">
+        <label>Temp Delta Across Rooms
+          <select id="tempdiff">
+            <option value="low">Low (minor)</option>
+            <option value="medium">Medium</option>
+            <option value="high">High (obvious imbalance)</option>
+          </select>
+        </label>
+        <label>Runtime Behavior
+          <select id="runtime">
+            <option value="long">Long runtime</option>
+            <option value="normal">Normal</option>
+            <option value="short">Short cycling</option>
+          </select>
+        </label>
+        <label>Outdoor Unit / Coil
+          <select id="coil">
+            <option value="unknown">Unknown</option>
+            <option value="normal">Looks normal</option>
+            <option value="dirty">Dirty / restricted</option>
+          </select>
+        </label>
+        <label>Thermostat Behavior
+          <select id="thermo">
+            <option value="normal">Appears normal</option>
+            <option value="suspect">Inconsistent / suspect</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="row three">
+        <label>Monthly Energy Spend ($)
+          <input id="energy" type="number" min="0" step="1" value="200" />
+        </label>
+        <label>Measured Supply Delta (°F)
+          <input id="delta" type="number" min="0" step="1" value="14" />
+        </label>
+        <label>Static Pressure Clue
+          <select id="static">
+            <option value="unknown">Unknown</option>
+            <option value="normal">Normal</option>
+            <option value="high">High / restrictive</option>
+          </select>
+        </label>
+      </div>
+
+      <h3 style="margin-top:18px;">Evidence Capture</h3>
+      <div class="row two">
+        <div>
+          <label>Jobsite Photos</label>
+          <div class="captureBtns">
+            <button type="button" onclick="document.getElementById('cameraInput').click()">Take Photo</button>
+            <button type="button" class="secondary" onclick="document.getElementById('uploadInput').click()">Upload Photos</button>
+            <button type="button" class="ghost" onclick="clearPhotos()">Clear Photos</button>
+          </div>
+          <input id="cameraInput" class="hiddenInput" type="file" accept="image/*" capture="environment" />
+          <input id="uploadInput" class="hiddenInput" type="file" accept="image/*" multiple />
+          <div class="small" style="margin-top:8px;">Use Take Photo on-site. Upload Photos is the fallback for existing images.</div>
+          <div class="gallery" id="gallery"></div>
+        </div>
+
+        <div>
+          <label>Pre-Fix Audio</label>
+          <div>
+            <button type="button" onclick="recordAudio('pre')">Record Pre</button>
+            <span class="small" id="preStatus">No recording yet.</span>
+          </div>
+          <audio id="prePlayback" controls></audio>
+
+          <label style="margin-top:14px;">Post-Fix Audio</label>
+          <div>
+            <button type="button" class="secondary" onclick="recordAudio('post')">Record Post</button>
+            <span class="small" id="postStatus">No recording yet.</span>
+          </div>
+          <audio id="postPlayback" controls></audio>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <button onclick="runDiagnosis()">Run Diagnosis</button>
+        <button class="secondary" onclick="generateClientProof()">Generate Client Proof</button>
+        <button class="ghost" onclick="loadDemo()">Load Demo</button>
+        <button class="warn" onclick="exportPacket()">Export Packet JSON</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Diagnostic Output</h3>
+      <div id="status"></div>
+
+      <div class="section">
+        <h4>Evidence Comparison</h4>
+        <pre id="evidenceOut">Capture pre and post audio, then run diagnosis.</pre>
+      </div>
+
+      <div class="section">
+        <h4>Primary Call</h4>
+        <pre id="primaryOut">Run diagnosis…</pre>
+      </div>
+
+      <div class="section">
+        <h4>Issue Ranking</h4>
+        <table id="rankTable">
+          <thead><tr><th>Issue</th><th>Score</th><th>Confidence</th></tr></thead>
+          <tbody><tr><td colspan="3">No results yet.</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h4>Action Plan</h4>
+        <pre id="actionOut">—</pre>
+      </div>
+
+      <div class="section">
+        <h4>Estimate + Retest</h4>
+        <pre id="estimateOut">—</pre>
+      </div>
+
+      <div class="section proofMode">
+        <h4>Client Proof Mode</h4>
+        <pre id="clientProofOut">Generate client proof to produce a customer-facing report.</pre>
+      </div>
+
+      <div class="section">
+        <h4>Packet Summary</h4>
+        <pre id="packetOut">No packet yet.</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+function titleize(s){ return s.replaceAll('_',' '); }
+
+const issueLibrary = {
+  airflow_restriction: { causes:["dirty filter","return/supply restriction","duct blockage"], actions:["Inspect and replace filter if needed","Check visible supply / return restrictions","Verify improved airflow after correction"], materials:["standard HVAC filter"], time:"15–45 min", cost:"$75–$250", tier:"LOW / QUICK FIX", energyPct:0.08 },
+  duct_imbalance: { causes:["closed / restricted vents","duct imbalance","delivery mismatch by zone"], actions:["Normalize vent positions","Inspect likely imbalance or blockage zones","Re-check room-to-room comfort after adjustment"], materials:["none initially"], time:"30–90 min", cost:"$100–$400", tier:"LOW–MEDIUM", energyPct:0.10 },
+  filter_blockage: { causes:["overdue filter","restricted return path","heavy dust load"], actions:["Replace or clean filter","Inspect return path for added restriction","Verify stronger airflow after service"], materials:["replacement filter"], time:"10–20 min", cost:"$20–$120", tier:"LOW / QUICK FIX", energyPct:0.06 },
+  thermal_inefficiency: { causes:["dirty outdoor coil","efficiency loss","heat transfer degradation"], actions:["Verify airflow path first","Inspect coil condition and obvious restriction","Escalate to deeper system inspection if performance remains weak"], materials:["coil cleaner if applicable"], time:"30–120 min", cost:"$100–$500", tier:"MEDIUM", energyPct:0.12 },
+  system_overwork: { causes:["long runtime under restricted delivery","efficiency loss","whole-system strain"], actions:["Reduce obvious restriction points","Check filter and airflow path","Retest runtime after correction"], materials:["replacement filter if needed"], time:"30–90 min", cost:"$100–$350", tier:"MEDIUM", energyPct:0.14 },
+  short_cycling: { causes:["control instability","thermostat issue","deeper system fault"], actions:["Document cycle length","Confirm airflow is not restricted","Escalate if rapid cycling persists after basics"], materials:["thermostat if confirmed bad"], time:"45–120 min", cost:"$150–$500", tier:"MEDIUM–HEAVY", energyPct:0.15 },
+  thermostat_issue: { causes:["bad thermostat behavior","inconsistent control signal","sensor / placement issue"], actions:["Check thermostat behavior against actual room response","Verify settings and obvious control issues","Replace or escalate if behavior remains inconsistent"], materials:["thermostat if needed"], time:"30–60 min", cost:"$100–$300", tier:"LOW–MEDIUM", energyPct:0.07 },
+  blower_or_delivery_issue: { causes:["blower weakness","delivery-side issue","abnormal air movement"], actions:["Check abnormal noise or movement clues","Verify airflow at multiple vents","Escalate if blower-side issue remains likely"], materials:["unknown until inspected"], time:"30–90 min", cost:"$100–$400", tier:"MEDIUM", energyPct:0.10 }
+};
+
+let imageStore = [];
+let audioMetrics = {
+  pre: {level:0, variance:0, url:null},
+  post:{level:0, variance:0, url:null}
+};
+let lastPacket = null;
+
+document.getElementById('cameraInput').addEventListener('change', handlePhotos);
+document.getElementById('uploadInput').addEventListener('change', handlePhotos);
+
+function handlePhotos(e){
+  const files = Array.from(e.target.files || []);
+  for(const file of files){
+    const reader = new FileReader();
+    reader.onload = evt => {
+      imageStore.push({name:file.name, dataUrl:evt.target.result});
+      renderGallery();
+    };
+    reader.readAsDataURL(file);
+  }
+  e.target.value = '';
+}
+function clearPhotos(){
+  imageStore = [];
+  renderGallery();
+}
+function renderGallery(){
+  const gallery = document.getElementById('gallery');
+  if(!imageStore.length){ gallery.innerHTML=''; return; }
+  gallery.innerHTML = imageStore.map((img, idx)=>`
+    <div class="thumb">
+      <img src="${img.dataUrl}" alt="jobsite photo ${idx+1}">
+      <div class="cap">${img.name}</div>
+    </div>
+  `).join('');
+}
+
+async function recordAudio(type){
+  const statusEl = document.getElementById(type + 'Status');
+  const playback = document.getElementById(type + 'Playback');
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined'){
+    statusEl.textContent = 'Audio recording not supported here.';
+    return;
+  }
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+
+    const timeData = new Uint8Array(analyser.fftSize);
+    const mediaRecorder = new MediaRecorder(stream);
+    const chunks = [];
+    const samples = [];
+
+    mediaRecorder.ondataavailable = e => { if(e.data && e.data.size > 0) chunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, {type:'audio/webm'});
+      if(audioMetrics[type].url) URL.revokeObjectURL(audioMetrics[type].url);
+      audioMetrics[type].url = URL.createObjectURL(blob);
+      playback.src = audioMetrics[type].url;
+
+      const avg = samples.reduce((a,b)=>a+b,0) / Math.max(samples.length,1);
+      const variance = samples.reduce((a,b)=>a + Math.pow(b-avg,2),0) / Math.max(samples.length,1);
+      audioMetrics[type].level = avg;
+      audioMetrics[type].variance = variance;
+
+      statusEl.textContent = `Recorded. level=${avg.toFixed(2)} variance=${variance.toFixed(2)}`;
+      stream.getTracks().forEach(t => t.stop());
+      ctx.close();
+    };
+
+    mediaRecorder.start();
+    statusEl.textContent = 'Recording…';
+
+    const interval = setInterval(()=>{
+      analyser.getByteTimeDomainData(timeData);
+      let sum = 0;
+      for(let i=0;i<timeData.length;i++){
+        const v = (timeData[i] - 128) / 128;
+        sum += Math.abs(v);
+      }
+      samples.push(sum / timeData.length * 100);
+    }, 100);
+
+    setTimeout(()=>{
+      clearInterval(interval);
+      mediaRecorder.stop();
+    }, 4000);
+  }catch(err){
+    statusEl.textContent = 'Mic permission denied or unavailable.';
+  }
+}
+
+function computeScores(i, audio){
+  let scores = {
+    airflow_restriction: 0, duct_imbalance: 0, filter_blockage: 0, thermal_inefficiency: 0,
+    system_overwork: 0, short_cycling: 0, thermostat_issue: 0, blower_or_delivery_issue: 0
+  };
+
+  if(i.complaint === 'weak_airflow'){ scores.airflow_restriction += 3; scores.blower_or_delivery_issue += 2; }
+  if(i.complaint === 'uneven_temp'){ scores.duct_imbalance += 3; scores.thermal_inefficiency += 1; }
+  if(i.complaint === 'poor_performance'){ scores.thermal_inefficiency += 3; scores.system_overwork += 1; }
+  if(i.complaint === 'long_runtime'){ scores.system_overwork += 4; scores.thermal_inefficiency += 1; }
+  if(i.complaint === 'short_cycle'){ scores.short_cycling += 4; scores.thermostat_issue += 1; }
+
+  if(i.filter === 'dirty'){ scores.filter_blockage += 4; scores.airflow_restriction += 2; scores.system_overwork += 1; }
+  if(i.duct === 'some_closed'){ scores.duct_imbalance += 2; scores.airflow_restriction += 1; }
+  if(i.duct === 'blocked'){ scores.duct_imbalance += 3; scores.airflow_restriction += 2; }
+  if(i.airflow === 'low'){ scores.airflow_restriction += 2; scores.filter_blockage += 1; scores.blower_or_delivery_issue += 1; }
+
+  if(i.tempdiff === 'medium'){ scores.duct_imbalance += 1; scores.thermal_inefficiency += 1; }
+  if(i.tempdiff === 'high'){ scores.duct_imbalance += 2; scores.thermal_inefficiency += 2; }
+
+  if(i.runtime === 'long'){ scores.system_overwork += 2; scores.airflow_restriction += 1; }
+  if(i.runtime === 'short'){ scores.short_cycling += 2; scores.thermostat_issue += 1; }
+
+  if(i.zone === 'single') scores.duct_imbalance += 2;
+  if(i.zone === 'multi'){ scores.duct_imbalance += 1; scores.airflow_restriction += 1; }
+  if(i.zone === 'whole'){ scores.system_overwork += 1; scores.thermal_inefficiency += 1; }
+
+  if(i.noise === 'abnormal'){ scores.blower_or_delivery_issue += 2; scores.short_cycling += 1; }
+  if(i.coil === 'dirty'){ scores.thermal_inefficiency += 2; scores.system_overwork += 1; }
+  if(i.thermo === 'suspect'){ scores.thermostat_issue += 3; scores.short_cycling += 1; }
+
+  if(i.delta <= 10){ scores.thermal_inefficiency += 2; scores.system_overwork += 1; }
+  else if(i.delta <= 14){ scores.thermal_inefficiency += 1; }
+
+  if(i.static === 'high'){ scores.airflow_restriction += 2; scores.filter_blockage += 1; scores.duct_imbalance += 1; }
+
+  if(audio.pre.level > 0){
+    if(audio.pre.level > 8) scores.blower_or_delivery_issue += 1;
+    if(audio.pre.variance > 8) scores.blower_or_delivery_issue += 1;
+  }
+  if(audio.pre.level > 0 && audio.post.level > 0){
+    const levelDrop = audio.pre.level - audio.post.level;
+    const varianceDrop = audio.pre.variance - audio.post.variance;
+    if(levelDrop > 2 || varianceDrop > 2){
+      scores.blower_or_delivery_issue -= 1;
+      scores.airflow_restriction -= 0.5;
+    }
+    if(levelDrop < 0.5 && i.noise === 'abnormal'){
+      scores.blower_or_delivery_issue += 1;
+    }
+  }
+
+  return scores;
+}
+
+function collectInputs(){
+  return {
+    customerName: document.getElementById('customerName').value.trim(),
+    customerPhone: document.getElementById('customerPhone').value.trim(),
+    siteAddress: document.getElementById('siteAddress').value.trim(),
+    customerNotes: document.getElementById('customerNotes').value.trim(),
+    techNotes: document.getElementById('techNotes').value.trim(),
+    actionTaken: document.getElementById('actionTaken').value.trim(),
+    visualNotes: document.getElementById('visualNotes').value.trim(),
+    complaint: document.getElementById('complaint').value,
+    zone: document.getElementById('zone').value,
+    filter: document.getElementById('filter').value,
+    duct: document.getElementById('duct').value,
+    airflow: document.getElementById('airflow').value,
+    noise: document.getElementById('noise').value,
+    tempdiff: document.getElementById('tempdiff').value,
+    runtime: document.getElementById('runtime').value,
+    coil: document.getElementById('coil').value,
+    thermo: document.getElementById('thermo').value,
+    energy: Number(document.getElementById('energy').value || 0),
+    delta: Number(document.getElementById('delta').value || 0),
+    static: document.getElementById('static').value
+  };
+}
+
+function renderEvidenceComparison(){
+  const pre = audioMetrics.pre;
+  const post = audioMetrics.post;
+  let txt = '';
+
+  if(pre.level <= 0 || post.level <= 0){
+    txt = 'Need both pre and post audio to compare evidence.\n\nCurrent:\n' +
+      '- pre level=' + pre.level.toFixed(2) + ' variance=' + pre.variance.toFixed(2) + '\n' +
+      '- post level=' + post.level.toFixed(2) + ' variance=' + post.variance.toFixed(2);
+  } else {
+    const levelDrop = pre.level - post.level;
+    const varianceDrop = pre.variance - post.variance;
+    txt += 'PRE AUDIO:\nlevel=' + pre.level.toFixed(2) + ' variance=' + pre.variance.toFixed(2) + '\n\n';
+    txt += 'POST AUDIO:\nlevel=' + post.level.toFixed(2) + ' variance=' + post.variance.toFixed(2) + '\n\n';
+    txt += 'CHANGE:\nlevel delta=' + levelDrop.toFixed(2) + '\nvariance delta=' + varianceDrop.toFixed(2) + '\n\n';
+    if(levelDrop > 2 || varianceDrop > 2){
+      txt += 'INTERPRETATION:\nMeaningful audio improvement detected. Fix likely reduced audible instability.';
+    } else if(levelDrop > 0.5 || varianceDrop > 0.5){
+      txt += 'INTERPRETATION:\nModerate improvement detected. Partial fix signal.';
+    } else {
+      txt += 'INTERPRETATION:\nMinimal audio change. Further investigation may be needed.';
+    }
+  }
+
+  document.getElementById('evidenceOut').innerText = txt;
+}
+
+function runDiagnosis(){
+  const i = collectInputs();
+  const scores = computeScores(i, audioMetrics);
+  const ranked = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top3 = ranked.slice(0,3);
+  const primary = top3[0][0];
+  const primaryScore = top3[0][1];
+  const confidence = clamp(Math.round((primaryScore / 12) * 100), 35, 95);
+
+  let severity = 1;
+  if(primaryScore >= 9) severity = 4;
+  else if(primaryScore >= 7) severity = 3;
+  else if(primaryScore >= 5) severity = 2;
+
+  const severityBand = ['NONE','MINOR','WATCH','SERVICE','URGENT','HAZARD'][severity];
+  const sevClass = severity >= 4 ? 'bad' : (severity >= 3 ? 'warnTxt' : 'ok');
+
+  const pkg = issueLibrary[primary];
+  const monthlyWaste = Math.round(i.energy * pkg.energyPct);
+  const annualWaste = monthlyWaste * 12;
+
+  renderEvidenceComparison();
+
+  document.getElementById('status').innerHTML =
+    '<span class="pill">Primary: ' + titleize(primary) + '</span>' +
+    '<span class="pill">Confidence: ' + confidence + '%</span>' +
+    '<span class="pill">Severity: <span class="' + sevClass + '">' + severity + ' (' + severityBand + ')</span></span>' +
+    '<span class="pill">Photos: ' + imageStore.length + '</span>' +
+    '<span class="pill">Pre audio: ' + (audioMetrics.pre.level > 0 ? 'yes' : 'no') + '</span>' +
+    '<span class="pill">Post audio: ' + (audioMetrics.post.level > 0 ? 'yes' : 'no') + '</span>';
+
+  document.getElementById('primaryOut').innerText =
+    'LIKELY ISSUE:\n' + titleize(primary) + '\n\n' +
+    'WHY IT WON:\n' +
+    'complaint=' + titleize(i.complaint) +
+    ', airflow=' + i.airflow +
+    ', runtime=' + i.runtime +
+    ', filter=' + i.filter +
+    ', duct=' + i.duct +
+    ', measured delta=' + i.delta + '°F' +
+    (audioMetrics.pre.level > 0 ? ', pre audio=' + audioMetrics.pre.level.toFixed(2) : '') +
+    (audioMetrics.post.level > 0 ? ', post audio=' + audioMetrics.post.level.toFixed(2) : '') +
+    '\n\nLIKELY CAUSES:\n- ' + pkg.causes.join('\n- ');
+
+  const tbody = document.querySelector('#rankTable tbody');
+  tbody.innerHTML = top3.map(([issue, score]) => {
+    const c = clamp(Math.round((score / 12) * 100), 25, 95);
+    return '<tr><td>' + titleize(issue) + '</td><td>' + score.toFixed(1) + '</td><td>' + c + '%</td></tr>';
+  }).join('');
+
+  document.getElementById('actionOut').innerText =
+    'RECOMMENDED ACTION:\n- ' + pkg.actions.join('\n- ') + '\n\n' +
+    'MATERIALS:\n- ' + pkg.materials.join('\n- ') + '\n\n' +
+    'SERVICE LEVEL:\n' + pkg.tier + '\n\n' +
+    'CUSTOMER REPORTED:\n' + (i.customerNotes || '—') + '\n\n' +
+    'TECH OBSERVATION:\n' + (i.techNotes || '—');
+
+  document.getElementById('estimateOut').innerText =
+    'TIME:\n' + pkg.time + '\n\n' +
+    'ESTIMATED RANGE:\n' + pkg.cost + '\n\n' +
+    'ENERGY IMPACT:\nLikely avoidable waste: ~$' + monthlyWaste + '/month\nRough annual drag: ~$' + annualWaste + '/year\n\n' +
+    'RETEST:\n- verify airflow improvement\n- verify room-to-room temperature response\n- verify runtime behavior improves\n- verify post-fix audio improves if abnormal noise was present';
+
+  lastPacket = {
+    tool: 'HVACSCOPE v2.6 CLIENT PROOF MODE',
+    customer: { name: i.customerName, phone: i.customerPhone, address: i.siteAddress },
+    notes: { customer: i.customerNotes, technician: i.techNotes },
+    work: { action_taken: i.actionTaken, visual_notes: i.visualNotes },
+    captures: {
+      photos: imageStore.map(p => p.name),
+      audio: {
+        pre: { level: audioMetrics.pre.level, variance: audioMetrics.pre.variance, present: !!audioMetrics.pre.url },
+        post:{ level: audioMetrics.post.level, variance: audioMetrics.post.variance, present: !!audioMetrics.post.url }
+      }
+    },
+    inputs: i,
+    output: {
+      primary_issue: primary,
+      ranked_issues: top3,
+      confidence: confidence,
+      severity: severity,
+      severity_band: severityBand,
+      likely_causes: pkg.causes,
+      actions: pkg.actions,
+      materials: pkg.materials,
+      time: pkg.time,
+      estimated_range: pkg.cost,
+      energy_monthly_drag: monthlyWaste,
+      energy_annual_drag: annualWaste
+    }
+  };
+
+  document.getElementById('packetOut').innerText = JSON.stringify(lastPacket, null, 2);
+}
+
+function generateClientProof(){
+  if(!lastPacket) runDiagnosis();
+  const p = lastPacket;
+  const primary = titleize(p.output.primary_issue);
+  const photoBefore = p.captures.photos.length ? 'Photos captured on site' : 'No photos attached';
+  const prePresent = p.captures.audio.pre.present;
+  const postPresent = p.captures.audio.post.present;
+
+  let soundSummary = 'Audio comparison not complete.';
+  if(prePresent && postPresent){
+    const levelDrop = p.captures.audio.pre.level - p.captures.audio.post.level;
+    const varianceDrop = p.captures.audio.pre.variance - p.captures.audio.post.variance;
+    if(levelDrop > 2 || varianceDrop > 2){
+      soundSummary = 'Before: louder / less stable operation\nAfter: quieter / more stable operation\nChange: system sound improved on-site';
+    } else if(levelDrop > 0.5 || varianceDrop > 0.5){
+      soundSummary = 'Before: more noticeable instability\nAfter: moderate improvement\nChange: partial sound improvement on-site';
+    } else {
+      soundSummary = 'Before/after sound change was limited\nChange: further investigation may still be needed';
+    }
+  }
+
+  const proof =
+`SERVICE REPORT
+
+Customer: ${p.customer.name || '—'}
+Address: ${p.customer.address || '—'}
+
+Reported Issue:
+${p.notes.customer || '—'}
+
+FIELD FINDINGS
+
+• ${primary}
+• Complaint pattern matched field conditions
+• Technician observed: ${p.notes.technician || '—'}
+
+VISUAL EVIDENCE
+
+${photoBefore}
+${p.work.visual_notes ? '• ' + p.work.visual_notes : ''}
+
+SYSTEM SOUND
+
+${soundSummary}
+
+WORK COMPLETED
+
+${p.work.action_taken ? '• ' + p.work.action_taken : '• Action log not entered'}
+
+RESULT
+
+• Primary issue addressed on-site
+• System response was rechecked
+• Runtime / airflow / comfort should be improved based on current field evidence
+
+IMPACT
+
+• Reduced strain on system
+• Improved comfort
+• Less wasted energy
+
+Estimated waste avoided:
+~$${p.output.energy_monthly_drag}/month
+~$${p.output.energy_annual_drag}/year
+
+SUMMARY
+
+Primary Issue:
+${primary}
+
+Confidence:
+${p.output.confidence}%
+
+Severity:
+${p.output.severity_band}
+
+Issue addressed and verified on-site`;
+
+  document.getElementById('clientProofOut').innerText = proof;
+}
+
+function exportPacket(){
+  if(!lastPacket) runDiagnosis();
+  const blob = new Blob([JSON.stringify(lastPacket, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hvacscope_client_proof_packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function loadDemo(){
+  document.getElementById('customerName').value = 'Demo Customer';
+  document.getElementById('customerPhone').value = '555-0102';
+  document.getElementById('siteAddress').value = '123 Demo St';
+  document.getElementById('customerNotes').value = 'House runs all day and never gets comfortable.';
+  document.getElementById('techNotes').value = 'Weak airflow at main vents. Filter looks overdue.';
+  document.getElementById('actionTaken').value = 'Replaced filter, opened vents, cleared obvious airflow restrictions, verified response.';
+  document.getElementById('visualNotes').value = 'Dirty filter removed. New filter installed. Supply vents opened and balanced.';
+  document.getElementById('complaint').value = 'long_runtime';
+  document.getElementById('zone').value = 'whole';
+  document.getElementById('filter').value = 'dirty';
+  document.getElementById('duct').value = 'blocked';
+  document.getElementById('airflow').value = 'low';
+  document.getElementById('noise').value = 'abnormal';
+  document.getElementById('tempdiff').value = 'high';
+  document.getElementById('runtime').value = 'long';
+  document.getElementById('coil').value = 'dirty';
+  document.getElementById('thermo').value = 'normal';
+  document.getElementById('energy').value = '280';
+  document.getElementById('delta').value = '11';
+  document.getElementById('static').value = 'high';
+
+  audioMetrics.pre.level = 8.6;
+  audioMetrics.pre.variance = 7.8;
+  audioMetrics.post.level = 4.9;
+  audioMetrics.post.variance = 3.2;
+  document.getElementById('preStatus').textContent = 'Demo evidence loaded.';
+  document.getElementById('postStatus').textContent = 'Demo evidence loaded.';
+  runDiagnosis();
+  generateClientProof();
+}
+</script>
+<script>
+window.addEventListener('load', function(){
+
+  function bumpBuy(){var b=document.getElementById('buyBtn'); if(!b)return;
+    b.style.transform='scale(1.08)'; setTimeout(function(){b.style.transform='';},220);
+    b.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  function wireBuy(){var b=document.getElementById('buyBtn'); if(!b)return;
+    b.addEventListener('click',function(e){var h=b.getAttribute('data-href'); if(h){location.href=h;return;}
+      e.preventDefault(); var t=b.textContent; b.textContent='Checkout opens at launch';
+      setTimeout(function(){b.textContent=t;},1600);});}
+
+  function clickOC(sub){ var bs=document.querySelectorAll('button');
+    for(var i=0;i<bs.length;i++){ if((bs[i].getAttribute('onclick')||'').indexOf(sub)>=0){ bs[i].click(); return true; } }
+    return false; }
+  // land on a fully scored sample call with the client proof generated
+  try{ clickOC('loadDemo'); clickOC('runDiagnosis'); clickOC('generateClientProof'); }catch(e){}
+  // gate the field-capture + export deliverables behind the buy
+  Array.prototype.forEach.call(document.querySelectorAll('button'), function(b){
+    var oc=b.getAttribute('onclick')||'';
+    if(/recordAudio|cameraInput|uploadInput|exportPacket/.test(oc)){
+      b.onclick=function(e){ if(e&&e.preventDefault)e.preventDefault(); bumpBuy(); return false; };
+      b.title='In the file you buy — $49, offline, in the field.';
+    }
+  });
+  wireBuy();
+});
+</script>
+</body>
+</html>
