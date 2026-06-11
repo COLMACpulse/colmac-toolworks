@@ -11,6 +11,7 @@ This repo hosts the storefront — a single `index.html`. The tools themselves a
 
 - **The Engines** — file tools for organizing, packaging, finding, and cleaning up files: Thought Vault, MAG DUMP, Batch Prep, Dropzone Action, Downloads Engine, Local Retrieval, Repo Alignment, Text Normalization.
 - **Field Scopes** — scored diagnosis tools for the trades, each with a customer-ready proof packet: Lawn, HVAC, Electrical, Leak, Pool, Ground & Drainage, Surface.
+- **VIRIDENCE** — plant lifecycle deviation engine. Reads a grow as behavior over time: gold-run baseline, deviation strip, 0 to 5 severity. Includes a live demo.
 - **Operator Pack** — all eight engines in one purchase.
 
 ## Why offline

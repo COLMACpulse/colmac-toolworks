@@ -279,7 +279,7 @@
       <h2>The Tools</h2>
       <span class="kicker">Download · own · run offline</span>
     </div>
-    <p class="lead-copy">Each tool is a single HTML file that runs in your browser. Buy it once, keep it forever. Three lines: file engines for people drowning in files, field scopes for the trades, and the writers' bench for film and TV.</p>
+    <p class="lead-copy">Each tool is a single HTML file that runs in your browser. Buy it once, keep it forever. File engines for people drowning in files, field scopes for the trades, the writers' bench for film and TV, and VIRIDENCE for the grow.</p>
 
     <div class="pack">
       <div>
@@ -298,6 +298,9 @@
 
     <div class="subhead">Field Scopes · Diagnosis tools for the trades</div>
     <div class="cards" id="scope-grid"></div>
+
+    <div class="subhead">VIRIDENCE · Read the grow as behavior over time</div>
+    <div class="cards" id="viridence-grid"></div>
 
     <div class="subhead">The Writers' Bench · Tools for the script</div>
     <p class="lead-copy" style="margin:2px 0 16px">The studio-side line: five single-file tools for writing and developing a film or show: story, characters, capture, transcript cleanup, and screenplay revision. Same deal as the rest. Buy once, run offline, keep forever.</p>
@@ -382,6 +385,9 @@ const SCOPES = [
   {name:"CARPETSCOPE",  sub:"Scored carpet & flooring condition diagnosis and proof.", price:"$49", a:"#b07cc9", buy:""},
   {name:"CABINETSCOPE", sub:"Scored cabinet & millwork condition diagnosis and proof.", price:"$49", a:"#c89a5a", buy:""},
 ];
+const VIRIDENCE = [
+  {name:"VIRIDENCE", sub:"Read the grow as behavior over time. A lifecycle deviation strip with a gold-run baseline and a 0 to 5 severity read. Offline, single file.", price:"$49", demo:"viridence-demo.html", a:"#5fe0cb", buy:""},
+];
 const FILMPACK = { name:"The Writers' Bench", sub:"All five writing tools, one purchase. $149 instead of $295 separately.", price:"$149", buy:"" };
 const FILM = [
   {name:"StoryForge", a:"#e0a33a", price:"$69", sub:"Treatment-first story engine. Premise and world into a treatment, episode map, and season read.", buy:""},
@@ -426,6 +432,7 @@ const card = p => `<div class="card" style="--a:${p.a}">
 
 document.getElementById('engine-grid').innerHTML = ENGINES.map(card).join('');
 document.getElementById('scope-grid').innerHTML  = SCOPES.map(card).join('');
+document.getElementById('viridence-grid').innerHTML = VIRIDENCE.map(card).join('');
 document.getElementById('film-grid').innerHTML = FILM.map(card).join('');
 document.getElementById('film-pack-name').textContent = FILMPACK.name;
 document.getElementById('film-pack-sub').textContent  = FILMPACK.sub;
@@ -455,7 +462,7 @@ const packbars=document.getElementById('packbars');
 SPECTRUM.forEach((c,i)=>{const b=document.createElement('i');
   b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=c;b.style.boxShadow="0 0 10px "+c;packbars.appendChild(b);});
 
-const missing=(PACK.buy?0:1)+(FILMPACK.buy?0:1)+ENGINES.filter(e=>!e.buy).length+SCOPES.filter(s=>!s.buy).length+FILM.filter(f=>!f.buy).length;
+const missing=(PACK.buy?0:1)+(FILMPACK.buy?0:1)+ENGINES.filter(e=>!e.buy).length+SCOPES.filter(s=>!s.buy).length+VIRIDENCE.filter(v=>!v.buy).length+FILM.filter(f=>!f.buy).length;
 const isLocal=location.protocol==='file:'||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 if(missing&&isLocal){const el=document.getElementById('setup');el.style.display='block';
   el.innerHTML=`⚙ Setup: ${missing} checkout link(s) empty. Once your Lemon Squeezy store is activated, paste each product's URL into <code>buy:""</code> in the config block.`;}

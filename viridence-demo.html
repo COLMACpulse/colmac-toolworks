@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VIRIDENCE Strip</title>
+<style>
+  :root{
+    --bg:#07100c; --panel:#0d1a13; --panel2:#102319; --ink:#eaf7ee; --muted:#9ab0a1;
+    --line:#1d3a2a; --accent:#8ff0a4; --warn:#f4c96a; --bad:#f26868; --blue:#66a7ff; --teal:#5fe0cb;
+    --hold:#4f7f54; --push:#74e36b; --reach:#4f8dff; --tension:#ffd35b; --break:#ff4e4e; --recover:#4fd6bf;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at top,#12291c 0,#07100c 38%,#050807 100%);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+  header{padding:22px 24px;border-bottom:1px solid var(--line);background:rgba(7,16,12,.82);position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
+  .eyebrow{font-size:12px;letter-spacing:.16em;color:var(--accent);font-weight:700}
+  h1{margin:5px 0 4px;font-size:28px;line-height:1.05}.sub{color:var(--muted);max-width:900px;font-size:14px}
+  main{padding:18px;max-width:1280px;margin:0 auto}.grid{display:grid;grid-template-columns:360px 1fr;gap:16px}.panel{background:linear-gradient(180deg,rgba(16,35,25,.96),rgba(9,20,14,.96));border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.26)}
+  .controls{display:grid;gap:12px}.btn{border:1px solid #2e5c40;background:#122c1d;color:var(--ink);border-radius:12px;padding:11px 12px;font-weight:800;cursor:pointer}.btn:hover{background:#173c27}.btn.primary{background:#1d5a32;border-color:#52c86a}.btn.warn{background:#3a2b10;border-color:#9c7a2a}.btn.ghost{background:transparent}.file{border:1px dashed #365d42;border-radius:14px;padding:14px;color:var(--muted)} input[type=file]{width:100%;margin-top:8px;color:var(--muted)}
+  .metric{display:grid;grid-template-columns:1fr auto;gap:8px;border-top:1px solid var(--line);padding:9px 0;font-size:13px}.metric:first-child{border-top:0}.metric b{color:var(--ink)}.metric span{color:var(--muted)}
+  .stripBox{padding:14px;background:#07120d;border:1px solid #183321;border-radius:16px;margin-bottom:14px}.stripTitle{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}.stripTitle b{font-size:14px}.stripTitle span{font-size:12px;color:var(--muted)}
+  canvas{max-width:100%;display:block;border-radius:12px;background:#030503}.canvasWrap{overflow-x:auto}.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{font-size:12px;color:#dbeee0;border:1px solid #294a34;border-radius:999px;padding:4px 8px;background:#0b1810}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .moment{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:start}.preview{width:100%;aspect-ratio:1/1;border-radius:14px;object-fit:cover;background:#07120d;border:1px solid var(--line)}
+  .signalName{font-size:26px;font-weight:900;letter-spacing:.02em}.line{color:#c7d7cb;margin:5px 0 12px}.bars{display:grid;gap:6px}.barRow{display:grid;grid-template-columns:72px 1fr 42px;gap:8px;align-items:center;font-size:12px;color:var(--muted)}.track{height:8px;border-radius:99px;background:#07120d;overflow:hidden;border:1px solid #1a3323}.fill{height:100%;width:0;border-radius:99px}
+  .feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-top:12px}.node{border:1px solid #1e3a29;border-radius:14px;background:#0a160f;overflow:hidden;cursor:pointer}.node.active{outline:2px solid var(--accent);box-shadow:0 0 0 4px rgba(143,240,164,.12)}.node img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}.nodeBody{padding:8px}.badge{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.04em;border-radius:999px;padding:3px 7px;color:#06100a}.small{font-size:11px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}.table th,.table td{padding:7px;border-bottom:1px solid #193322;text-align:left;color:#cfe4d5}.table th{color:#94b99e;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.status{font-size:13px;color:#bdd1c2;min-height:18px}.warnText{color:#f2d086}.badText{color:#ff9f9f}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.moment{grid-template-columns:1fr}.preview{max-width:220px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">VIRIDENCE</div>
+  <h1>Strip v2 — Gold Run Baseline + Deviation View</h1>
+  <div class="sub">Local-only proof kernel. Load the packaged Gold Run, compare a new sequence, and read the plant as behavior over time: HOLD / PUSH / REACH / TENSION / BREAK / RECOVER.</div>
+</header>
+<main>
+  <div class="grid">
+    <section class="panel controls">
+      <button class="btn primary" id="loadGold">Load packaged Gold Run v1</button>
+      <div class="file">
+        <b>Compare run</b><br>
+        <span>Select images for a new run. Numbered filenames sort best.</span>
+        <input id="compareFiles" type="file" accept="image/*" multiple>
+      </div>
+      <button class="btn" id="runCompare">Run baseline compare</button>
+      <button class="btn ghost" id="exportJson">Export current analysis JSON</button>
+      <div class="status" id="status">Ready.</div>
+      <div class="panel" style="padding:12px;background:#08140e;box-shadow:none">
+        <div class="metric"><span>Gold Run frames</span><b id="goldCount">0</b></div>
+        <div class="metric"><span>Compare frames</span><b id="cmpCount">0</b></div>
+        <div class="metric"><span>Reference match</span><b id="matchScore">—</b></div>
+        <div class="metric"><span>Deviation severity</span><b id="devScore">—</b></div>
+        <div class="metric"><span>Dominant arc</span><b id="arcSummary">—</b></div>
+      </div>
+      <div class="legend">
+        <span class="chip"><i class="dot" style="background:var(--hold)"></i>HOLD</span>
+        <span class="chip"><i class="dot" style="background:var(--push)"></i>PUSH</span>
+        <span class="chip"><i class="dot" style="background:var(--reach)"></i>REACH</span>
+        <span class="chip"><i class="dot" style="background:var(--tension)"></i>TENSION</span>
+        <span class="chip"><i class="dot" style="background:var(--break)"></i>BREAK</span>
+        <span class="chip"><i class="dot" style="background:var(--recover)"></i>RECOVER</span>
+      </div>
+    </section>
+    <section>
+      <div class="panel">
+        <div class="stripBox">
+          <div class="stripTitle"><b>Gold Run Strip</b><span>your first reference lifecycle signature</span></div>
+          <div class="canvasWrap"><canvas id="goldStrip" width="900" height="90"></canvas></div>
+        </div>
+        <div class="stripBox">
+          <div class="stripTitle"><b>Compare Strip</b><span>current run rendered against same language</span></div>
+          <div class="canvasWrap"><canvas id="cmpStrip" width="900" height="90"></canvas></div>
+        </div>
+        <div class="stripBox">
+          <div class="stripTitle"><b>Deviation Ribbon</b><span>green = close, yellow/red = drift from Gold Run</span></div>
+          <div class="canvasWrap"><canvas id="devStrip" width="900" height="70"></canvas></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="stripTitle"><b>Selected Moment</b><span id="momentIndex">none selected</span></div>
+        <div class="moment">
+          <img class="preview" id="preview" alt="Selected image preview">
+          <div>
+            <div class="signalName" id="signalName">—</div>
+            <div class="line" id="signalLine">Load a run and select a slice or image.</div>
+            <div class="bars" id="bars"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="stripTitle"><b>Timeline Feed</b><span>tap a frame to inspect</span></div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+const SIGNALS=['HOLD','PUSH','REACH','TENSION','BREAK','RECOVER'];
+const COLORS={HOLD:'#4f7f54',PUSH:'#74e36b',REACH:'#4f8dff',TENSION:'#ffd35b',BREAK:'#ff4e4e',RECOVER:'#4fd6bf'};
+const GOLD_ORDER = ["1A32F755-FBC6-459D-ADD4-CC54CBFFA090.jpeg", "72E3A272-7518-44E8-8D7C-7E71B072AE44.jpeg", "8A007636-65BF-4A22-B2EC-2D038A2C6CF5.jpeg", "39334D37-BBBD-48B5-A3F8-839E4A5744A0.jpeg", "BF4A62C5-BD3F-41B4-95A4-B967D7204905.jpeg", "6156EC56-6F94-4555-BEB8-588613A2C980.jpeg", "3EB3F5DD-5CFB-4AF2-89EC-A355B0EE91CC.jpeg", "60233084-DE4F-468A-89FE-689C4ADB189B.jpeg", "90564EA8-3EAD-40D4-BCE5-4B2D3C172CE7.jpeg"];
+let goldRun=null, compareRun=null, activeRun=null, activeIndex=0, lastExport=null;
+const $=id=>document.getElementById(id);
+function setStatus(s){$('status').textContent=s;}
+function clamp(x,a=0,b=1){return Math.max(a,Math.min(b,x));}
+function lerp(a,b,t){return a+(b-a)*t}
+function hexToRgb(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function rgbToHex(r,g,b){return '#'+[r,g,b].map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,'0')).join('')}
+function blendSignal(v){let rgb=[0,0,0], sum=0; SIGNALS.forEach((s,i)=>{const w=v[i]||0; const c=hexToRgb(COLORS[s]); rgb[0]+=c[0]*w; rgb[1]+=c[1]*w; rgb[2]+=c[2]*w; sum+=w;}); if(sum<.001)return '#203325'; return rgbToHex(rgb[0]/sum,rgb[1]/sum,rgb[2]/sum)}
+function dominant(v){let mi=0; for(let i=1;i<v.length;i++) if(v[i]>v[mi]) mi=i; return SIGNALS[mi];}
+function second(v){let arr=v.map((x,i)=>[x,i]).sort((a,b)=>b[0]-a[0]); return SIGNALS[arr[1][1]];}
+function lineFor(v){const d=dominant(v), s=second(v); const mild=v[SIGNALS.indexOf(s)]>.22; const map={HOLD:'Holding steady. Low meaningful change.',PUSH:'Steady push. Structure building clean.',REACH:'Reaching. Extension is outrunning fill.',TENSION:'Some tension forming. Watch the pattern.',BREAK:'Sharp change present. Treat as a disruption signal.',RECOVER:'Recovery trend. Moving back toward stability.'}; return mild? `${map[d]} Secondary: ${s}.` : map[d];}
+async function loadImage(src){return new Promise((res,rej)=>{const img=new Image(); img.onload=()=>res(img); img.onerror=rej; img.src=src;});}
+function drawToData(img, size=180){const c=document.createElement('canvas'); c.width=size; c.height=size; const ctx=c.getContext('2d',{willReadFrequently:true}); const scale=Math.max(size/img.width,size/img.height); const w=img.width*scale,h=img.height*scale; ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h); return {canvas:c,ctx,data:ctx.getImageData(0,0,size,size),url:c.toDataURL('image/jpeg',.78)};}
+function analyzeFrame(raw, prev){const d=raw.data.data; const n=raw.data.width*raw.data.height; let area=0,minX=999,minY=999,maxX=-1,maxY=-1, sumR=0,sumG=0,sumB=0; const mask=new Uint8Array(n);
+  for(let i=0,p=0;i<d.length;i+=4,p++){const r=d[i],g=d[i+1],b=d[i+2]; const exg=2*g-r-b; const green=(g>45 && exg>18 && g>r*.78 && g>b*.9); if(green){mask[p]=1; area++; const x=p%raw.data.width,y=(p/raw.data.width)|0; if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y; sumR+=r;sumG+=g;sumB+=b;}}
+  if(area<20){minX=0;minY=0;maxX=raw.data.width-1;maxY=raw.data.height-1;}
+  const boxW=Math.max(1,maxX-minX+1), boxH=Math.max(1,maxY-minY+1), boxA=boxW*boxH; const areaRatio=area/n, fill=area/boxA, elong=boxH/boxW; let edge=0;
+  for(let y=1;y<raw.data.height-1;y++) for(let x=1;x<raw.data.width-1;x++){const p=y*raw.data.width+x; if(mask[p] && (!mask[p-1]||!mask[p+1]||!mask[p-raw.data.width]||!mask[p+raw.data.width])) edge++;}
+  const rough=edge/Math.sqrt(area+1); let cd=0, anom=0, sev=0, loss=0; if(prev){const pd=prev.raw.data.data, pm=prev.mask; let count=0, prevArea=prev.area; for(let i=0,p=0;i<d.length;i+=4,p++){if(mask[p]||pm[p]){const dr=Math.abs(d[i]-pd[i]), dg=Math.abs(d[i+1]-pd[i+1]), db=Math.abs(d[i+2]-pd[i+2]); const delta=(dr+dg+db)/(255*3); sev+=delta; if(delta>.18) anom++; count++;}} sev=count?sev/count:0; anom=count?anom/count:0; cd=Math.sqrt(Math.pow((sumR/(area||1))-(prev.mean[0]),2)+Math.pow((sumG/(area||1))-(prev.mean[1]),2)+Math.pow((sumB/(area||1))-(prev.mean[2]),2))/255; loss=Math.max(0,(prevArea-area)/(prevArea+1)); }
+  return {raw,mask,area,areaRatio,fill,elong,rough,mean:[sumR/(area||1),sumG/(area||1),sumB/(area||1)],cd,anom,sev,loss,box:{minX,minY,maxX,maxY,boxW,boxH}};}
+function normalizeFeatures(frames){const vals={area:[],fill:[],elong:[],rough:[],cd:[],anom:[],sev:[],loss:[]}; frames.forEach((f,i)=>{const p=frames[i-1]; vals.area.push(p?(f.area-p.area)/(p.area+1):0); vals.fill.push(f.fill); vals.elong.push(f.elong); vals.rough.push(f.rough); vals.cd.push(f.cd); vals.anom.push(f.anom); vals.sev.push(f.sev); vals.loss.push(f.loss);}); const bounds={}; for(const k in vals){const arr=vals[k].slice().sort((a,b)=>a-b); bounds[k]=[arr[Math.floor(arr.length*.05)]??0, arr[Math.floor(arr.length*.95)]??1]; if(bounds[k][1]-bounds[k][0]<1e-6) bounds[k][1]=bounds[k][0]+1;} return frames.map((f,i)=>{function norm(k,x){const [lo,hi]=bounds[k]; return clamp((x-lo)/(hi-lo));} const p=frames[i-1]; const areaDelta=p?(f.area-p.area)/(p.area+1):0; const n={areaGain:clamp(norm('area',areaDelta)), areaLoss:clamp(norm('loss',f.loss)), fill:norm('fill',f.fill), elong:norm('elong',f.elong), rough:norm('rough',f.rough), cd:norm('cd',f.cd), anom:norm('anom',f.anom), sev:norm('sev',f.sev)}; const push=clamp(.45*n.areaGain+.28*n.fill+.12*(1-n.sev)+.15*(1-n.anom)); const reach=clamp(.58*n.elong+.22*n.areaGain-.22*n.fill); const tension=clamp(.32*n.cd+.28*n.anom+.22*n.rough+.18*n.sev-.18*n.areaLoss); const brk=clamp(.42*n.areaLoss+.25*n.sev+.20*n.anom+.13*n.cd); let recover=0; if(i>1){const prevSig=frames[i-1].signal||[0,0,0,0,0,0]; recover=clamp(Math.max(0,prevSig[3]-tension)*.55+Math.max(0,prevSig[4]-brk)*.75+(.18*(1-n.anom)));}
+      const hold=clamp(.42*(1-n.cd)+.22*(1-n.anom)+.18*(1-n.sev)+.18*(1-Math.abs(areaDelta)*5)); let v=[hold,push,reach,tension,brk,recover].map(x=>clamp(x)); const max=Math.max(...v, .001); v=v.map(x=>clamp(x/(max*1.18))); f.norm=n; f.signal=v; return f; });}
+async function analyzeSources(sources, name){setStatus(`Analyzing ${name} (${sources.length} frames)…`); const imgs=[]; for(let i=0;i<sources.length;i++){const src=sources[i].src||sources[i]; const img=await loadImage(src); const raw=drawToData(img,180); imgs.push({img,raw,name:sources[i].name||`frame_${i+1}`,src:raw.url}); await new Promise(r=>setTimeout(r,0));}
+  const frames=[]; for(let i=0;i<imgs.length;i++){frames.push(analyzeFrame(imgs[i].raw, frames[i-1])); frames[i].name=imgs[i].name; frames[i].src=imgs[i].src; frames[i].index=i;}
+  normalizeFeatures(frames); const run={name,frames,arc:compressArc(frames.map(f=>dominant(f.signal)))}; setStatus(`Analyzed ${name}.`); return run;}
+function compressArc(labels){const out=[]; labels.forEach(l=>{if(out[out.length-1]!==l) out.push(l)}); return out.join(' → ');}
+function drawStrip(canvas, run, opts={}){const ctx=canvas.getContext('2d'); const w=canvas.width,h=canvas.height; ctx.clearRect(0,0,w,h); ctx.fillStyle='#030503'; ctx.fillRect(0,0,w,h); if(!run){ctx.fillStyle='#45604b';ctx.fillText('No run loaded',18,30);return;} const frames=run.frames,N=frames.length, slice=w/Math.max(1,N); ctx.save(); ctx.shadowBlur=16; for(let i=0;i<N;i++){const f=frames[i]; const col=blendSignal(f.signal); const x=i*slice; const intensity=Math.max(...f.signal); ctx.shadowColor=col; ctx.fillStyle=col; ctx.globalAlpha=.35+.55*intensity; ctx.fillRect(x,0,Math.ceil(slice)+1,h*.58); ctx.globalAlpha=.16; SIGNALS.forEach((s,j)=>{ctx.fillStyle=COLORS[s]; const laneY=h*.64+j*(h*.32/6); ctx.fillRect(x,laneY,Math.ceil(slice)+1,(h*.32/6)*clamp(f.signal[j]));}); }
+  ctx.restore(); ctx.globalAlpha=1; ctx.strokeStyle='rgba(255,255,255,.12)'; for(let i=0;i<=N;i+=Math.max(1,Math.round(N/12))){const x=i*slice; ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();} ctx.strokeStyle='rgba(143,240,164,.35)'; ctx.strokeRect(.5,.5,w-1,h-1); canvas.onclick=(ev)=>{const rect=canvas.getBoundingClientRect(); const ix=Math.min(N-1,Math.max(0,Math.floor((ev.clientX-rect.left)/rect.width*N))); selectMoment(run,ix);};}
+function resample(frames, n){if(!frames||!frames.length)return []; if(n<=1)return [frames[0]]; const out=[]; for(let i=0;i<n;i++){const pos=i*(frames.length-1)/(n-1); const lo=Math.floor(pos), hi=Math.ceil(pos), t=pos-lo; const sig=SIGNALS.map((_,j)=>lerp(frames[lo].signal[j], frames[hi].signal[j], t)); out.push({...frames[lo], signal:sig});} return out;}
+function deviation(a,b){let s=0; for(let i=0;i<6;i++){const weight=[.55,1,1,1.45,2.2,1.2][i]; s+=weight*Math.pow((a[i]||0)-(b[i]||0),2);} return Math.sqrt(s/6);}
+function drawDeviation(canvas, baseRun, cmpRun){const ctx=canvas.getContext('2d'); const w=canvas.width,h=canvas.height; ctx.clearRect(0,0,w,h); ctx.fillStyle='#030503'; ctx.fillRect(0,0,w,h); if(!baseRun||!cmpRun){ctx.fillStyle='#45604b';ctx.fillText('Load baseline and compare run',18,30);return null;} const N=cmpRun.frames.length, base=resample(baseRun.frames,N); const slice=w/N; let total=0,maxD=0; for(let i=0;i<N;i++){const d=deviation(cmpRun.frames[i].signal,base[i].signal); total+=d; maxD=Math.max(maxD,d); const sev=clamp(d/.72); let col= sev<.33? '#66d37a' : sev<.66? '#ffd35b' : '#ff5a52'; ctx.fillStyle=col; ctx.globalAlpha=.25+.65*sev; ctx.fillRect(i*slice,0,Math.ceil(slice)+1,h); ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(i*slice,h*(1-sev),Math.ceil(slice)+1,h*sev); }
+  ctx.globalAlpha=1; ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.strokeRect(.5,.5,w-1,h-1); const avg=total/N; const severity=clamp(avg/.72)*5; const match=Math.round(100*Math.exp(-2.25*avg)); $('matchScore').textContent=match+'%'; $('devScore').textContent=severity.toFixed(1)+' / 5'; return {avg,maxD,severity,match};}
+function renderFeed(run){const feed=$('feed'); feed.innerHTML=''; if(!run)return; run.frames.forEach((f,i)=>{const d=dominant(f.signal); const el=document.createElement('div'); el.className='node'+(i===activeIndex?' active':''); el.onclick=()=>selectMoment(run,i); el.innerHTML=`<img src="${f.src}"><div class="nodeBody"><span class="badge" style="background:${COLORS[d]}">${d}</span><div class="small">${i+1}. ${lineFor(f.signal)}</div></div>`; feed.appendChild(el);});}
+function selectMoment(run,i){activeRun=run; activeIndex=i; const f=run.frames[i]; $('preview').src=f.src; const d=dominant(f.signal); $('signalName').textContent=d; $('signalName').style.color=COLORS[d]; $('signalLine').textContent=lineFor(f.signal); $('momentIndex').textContent=`${run.name} / frame ${i+1} of ${run.frames.length}`; const bars=$('bars'); bars.innerHTML=''; SIGNALS.forEach((s,j)=>{const v=f.signal[j]; const row=document.createElement('div'); row.className='barRow'; row.innerHTML=`<span>${s}</span><div class="track"><div class="fill" style="width:${Math.round(v*100)}%;background:${COLORS[s]}"></div></div><span>${v.toFixed(2)}</span>`; bars.appendChild(row);}); renderFeed(run);}
+async function loadGold(){const sources=GOLD_ORDER.map(n=>({src:'viridence-images/'+n,name:n})); goldRun=await analyzeSources(sources,'Gold Run v1'); $('goldCount').textContent=goldRun.frames.length; $('arcSummary').textContent=goldRun.arc; drawStrip($('goldStrip'),goldRun); renderFeed(goldRun); selectMoment(goldRun,0); lastExport={goldRun};}
+async function loadCompareFiles(files){const arr=[...files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true})).map(f=>({src:URL.createObjectURL(f),name:f.name})); compareRun=await analyzeSources(arr,'Compare Run'); $('cmpCount').textContent=compareRun.frames.length; drawStrip($('cmpStrip'),compareRun); renderFeed(compareRun); selectMoment(compareRun,0); lastExport={goldRun,compareRun};}
+$('loadGold').onclick=loadGold; $('compareFiles').onchange=e=>loadCompareFiles(e.target.files);
+$('runCompare').onclick=()=>{if(!goldRun){setStatus('Load Gold Run first.');return;} if(!compareRun){compareRun=goldRun; $('cmpCount').textContent=compareRun.frames.length; drawStrip($('cmpStrip'),compareRun);} const dev=drawDeviation($('devStrip'),goldRun,compareRun); $('arcSummary').textContent=compareRun.arc; setStatus(dev?`Compare complete. Match ${dev.match}%, severity ${dev.severity.toFixed(1)}/5.`:'Compare unavailable.'); lastExport={goldRun,compareRun,deviation:dev};};
+$('exportJson').onclick=()=>{if(!lastExport){setStatus('Nothing to export yet.');return;} const slim=(run)=>run?{name:run.name,arc:run.arc,frames:run.frames.map(f=>({index:f.index,name:f.name,signal:Object.fromEntries(SIGNALS.map((s,i)=>[s,+f.signal[i].toFixed(4)])),dominant:dominant(f.signal),line:lineFor(f.signal),features:f.norm}))}:null; const payload={created:new Date().toISOString(),signals:SIGNALS,baseline:slim(goldRun),compare:slim(compareRun)}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='viridence_analysis_export.json'; a.click();};
+// boot blank canvases
+[goldStrip,cmpStrip,devStrip].forEach(c=>{const ctx=c.getContext('2d'); ctx.fillStyle='#030503';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#45604b';ctx.font='14px system-ui';ctx.fillText('Load run to render strip',18,30);});
+</script>
+</body>
+</html>
