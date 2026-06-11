@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TEXT NORMALIZATION ENGINE v3.4 — STANDALONE</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel2: #1d2330;
+      --line: #2a3140;
+      --text: #e8ecf1;
+      --muted: #9aa4b2;
+      --accent: #7dd3fc;
+      --good: #86efac;
+      --warn: #fbbf24;
+      --bad: #fca5a5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0f1115 0%, #0c0f14 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .wrap { max-width: 1360px; margin: 0 auto; padding: 18px; }
+    .top {
+      display: grid;
+      grid-template-columns: 1.25fr .95fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: rgba(23, 26, 33, 0.97);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.22);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.08; }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    p, li { color: var(--muted); line-height: 1.45; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    button, select, input {
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      color: var(--text);
+      padding: 11px 14px;
+      font-size: 14px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    button.primary { background: #153245; border-color: #24506e; }
+    button.good { background: #173221; border-color: #28553a; }
+    button.warn { background: #3b2c13; border-color: #6f5321; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    textarea {
+      width: 100%;
+      min-height: 440px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #11161f;
+      color: var(--text);
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .grid3 { display: grid; grid-template-columns: 1.08fr .84fr 1.08fr; gap: 16px; }
+    .stack { display: grid; gap: 16px; }
+    .listbox {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.02);
+      padding: 12px;
+    }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .status { margin-top: 10px; min-height: 20px; color: var(--muted); font-size: 14px; }
+    .goodtext { color: var(--good); }
+    .warntext { color: var(--warn); }
+    .badtext { color: var(--bad); }
+    .mini { font-size: 12px; color: var(--muted); }
+    .rulegrid { display: grid; gap: 10px; }
+    .check {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.02);
+      font-size: 14px;
+    }
+    .check input { transform: scale(1.1); }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    code {
+      background: rgba(255,255,255,.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .plan {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.02);
+      padding: 12px;
+    }
+    .plan ul { margin: 8px 0 0 18px; padding: 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-size: 11px;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .tag.good { color: var(--good); border-color: rgba(134,239,172,.35); }
+    .tag.warn { color: var(--warn); border-color: rgba(251,191,36,.35); }
+    .tag.bad { color: var(--bad); border-color: rgba(252,165,165,.35); }
+    @media (max-width: 1100px) {
+      .top, .grid3 { grid-template-columns: 1fr; }
+      textarea { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+<style>
+  .demo-bar{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    justify-content:space-between;padding:12px clamp(14px,3vw,24px);background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border-bottom:1px solid var(--line);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  .demo-bar .demo-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+  .demo-tag{font-size:11px;font-weight:800;letter-spacing:.16em;color:#0f1115;background:var(--accent);
+    padding:4px 9px;border-radius:6px;white-space:nowrap}
+  .demo-msg{font-size:13px;color:var(--muted);line-height:1.4}
+  .demo-msg b{color:var(--text);font-weight:600}
+  .demo-cta{font-size:13px;font-weight:800;color:#0f1115;background:var(--good);padding:10px 18px;border-radius:8px;
+    text-decoration:none;white-space:nowrap;box-shadow:0 0 0 1px rgba(134,239,172,.35);transition:transform .15s,filter .15s}
+  .demo-cta:hover{filter:brightness(1.06)}
+  .demo-note{font-size:11.5px;color:var(--muted);opacity:.85;margin-top:6px}
+</style>
+<div class="demo-bar">
+  <div class="demo-left">
+    <span class="demo-tag">LIVE DEMO</span>
+    <span class="demo-msg">The real engine, capped at 2,000 characters. <b>The file you buy runs offline, forever, with no limits — plus a one-click audit report.</b></span>
+  </div>
+  <a class="demo-cta" id="buyBtn" href="#" data-href="">Get the file — $19</a>
+</div>
+  <div class="wrap">
+    <div class="top">
+      <div class="card">
+        <h1>TEXT NORMALIZATION ENGINE v3.4</h1>
+        <p>
+          <strong>Cleans pasted text. Won't rewrite it.</strong>
+          Normalizes spacing, bullets, and structure — never infers, summarizes, or rewords.
+          Local-first. No cloud. Same input plus same rules equals same output, every time.
+        </p>
+        <div class="row">
+          <button id="formatBtn" class="primary">Build Normalization Output</button>
+          <button id="copyBtn" class="good" disabled>Copy Output</button>
+          <button id="downloadBtn" class="good" disabled>Download .txt</button>
+          <button id="reportBtn" class="warn" disabled>Download Report</button>
+          <button id="sampleBtn">Try Sample Messy Text</button>
+          <button id="swapBtn">Swap Input ← Output</button>
+          <button id="resetBtn" class="warn">Reset</button>
+        </div>
+        <div class="status" id="status">Paste source text and build the normalization output.</div>
+        <div class="stats">
+          <div class="pill" id="inChars">Input: 0 chars</div>
+          <div class="pill" id="outChars">Output: 0 chars</div>
+          <div class="pill" id="lineCount">Lines: 0</div>
+          <div class="pill" id="ruleMode">Mode: Standard clean</div>
+          <div class="pill" id="deltaPill">Delta: 0 chars</div>
+        </div>
+      </div>
+
+      <div class="card stack">
+        <div>
+          <h2>What this does</h2>
+          <div class="listbox">
+            <ul>
+              <li><strong class="goodtext">Cleans</strong> spacing, bullets, decorative separators, broken line wraps.</li>
+              <li><strong class="goodtext">Preserves</strong> your wording, your facts, your structure where it's clear.</li>
+              <li><strong class="goodtext">Surfaces</strong> ambiguity rather than guessing — if structure is weak, it stays weak, just cleaner.</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <h2>What this won't do</h2>
+          <div class="listbox">
+            <ul>
+              <li><strong class="badtext">Won't</strong> rewrite, summarize, or paraphrase any line.</li>
+              <li><strong class="badtext">Won't</strong> invent missing content or "fix" your sentences.</li>
+              <li><strong class="badtext">Won't</strong> send your text anywhere — runs entirely in this tab.</li>
+            </ul>
+            <p class="mini" style="margin-top:8px;">
+              Every change is driven by a visible rule toggle. Every action is counted in the report. Same input plus same toggles always produces identical output.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <h2>Input</h2>
+        <textarea id="inputText" placeholder="Paste the raw text here..."></textarea>
+      </div>
+
+      <div class="card">
+        <h2>Rules</h2>
+        <div class="row" style="margin-top:0;">
+          <select id="modeSelect" style="width:100%;">
+            <option value="standard">Standard clean</option>
+            <option value="checklist">Checklist</option>
+            <option value="csvish">CSV-ish rows</option>
+            <option value="paragraphs">Paragraph pack</option>
+          </select>
+        </div>
+        <div class="mini" id="modeDesc" style="margin-top:6px; padding: 0 4px;">
+          Standard clean: line-by-line normalization. Spacing, bullets, separators, broken wraps.
+        </div>
+
+        <div class="rulegrid" style="margin-top:12px;">
+          <label class="check"><input type="checkbox" id="trimEdges" checked> Trim line edges</label>
+          <label class="check"><input type="checkbox" id="collapseSpaces" checked> Collapse repeated spaces and tabs</label>
+          <label class="check"><input type="checkbox" id="normalizeBullets" checked> Normalize bullets and dash styles</label>
+          <label class="check"><input type="checkbox" id="removeEmptyBursts" checked> Collapse repeated empty lines</label>
+          <label class="check"><input type="checkbox" id="stripDecorative" checked> Remove decorative separators like <code>-----</code> and <code>=====</code></label>
+          <label class="check"><input type="checkbox" id="joinBroken" checked> Join broken wrapped lines when evidence is safe</label>
+          <label class="check"><input type="checkbox" id="titleCaseHeaders"> Force obvious headers to Title Case</label>
+          <label class="check"><input type="checkbox" id="lowerListNoise" checked> Remove leading numbering noise like <code>1)</code> or <code>(a)</code></label>
+          <label class="check"><input type="checkbox" id="preserveIndent"> Preserve leading indentation</label>
+          <label class="check"><input type="checkbox" id="normalizeQuotes"> Convert smart quotes (<code>“ ” ‘ ’</code>) to ASCII (<code>" '</code>)</label>
+        </div>
+
+        <div class="split" style="margin-top:12px;">
+          <div>
+            <div class="label">Output line ending</div>
+            <select id="lineEnding" style="width:100%;">
+              <option value="lf">LF</option>
+              <option value="crlf">CRLF</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Download name</div>
+            <input id="downloadName" type="text" value="normalized-text-output" style="width:100%;" />
+          </div>
+        </div>
+
+        <div class="plan" id="planBox">
+          <div class="mini">No normalization report yet.</div>
+        </div>
+
+        <div class="mini" style="margin-top:12px;">
+          This engine is for cleanup, not interpretation. If structure is weak, it stays weak — just cleaner.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Output</h2>
+        <textarea id="outputText" placeholder="Normalized output appears here..." readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const inputText = document.getElementById('inputText');
+  const outputText = document.getElementById('outputText');
+  const formatBtn = document.getElementById('formatBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const reportBtn = document.getElementById('reportBtn');
+  const sampleBtn = document.getElementById('sampleBtn');
+  const swapBtn = document.getElementById('swapBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const modeSelect = document.getElementById('modeSelect');
+  const modeDesc = document.getElementById('modeDesc');
+  const status = document.getElementById('status');
+  const inChars = document.getElementById('inChars');
+  const outChars = document.getElementById('outChars');
+  const lineCount = document.getElementById('lineCount');
+  const ruleMode = document.getElementById('ruleMode');
+  const deltaPill = document.getElementById('deltaPill');
+  const lineEnding = document.getElementById('lineEnding');
+  const downloadName = document.getElementById('downloadName');
+  const planBox = document.getElementById('planBox');
+
+  let lastReport = null;
+
+  const controls = {
+    trimEdges: document.getElementById('trimEdges'),
+    collapseSpaces: document.getElementById('collapseSpaces'),
+    normalizeBullets: document.getElementById('normalizeBullets'),
+    removeEmptyBursts: document.getElementById('removeEmptyBursts'),
+    stripDecorative: document.getElementById('stripDecorative'),
+    joinBroken: document.getElementById('joinBroken'),
+    titleCaseHeaders: document.getElementById('titleCaseHeaders'),
+    lowerListNoise: document.getElementById('lowerListNoise'),
+    preserveIndent: document.getElementById('preserveIndent'),
+    normalizeQuotes: document.getElementById('normalizeQuotes')
+  };
+
+  function setStatus(msg, tone='normal') {
+    status.className = 'status';
+    if (tone === 'good') status.classList.add('goodtext');
+    if (tone === 'warn') status.classList.add('warntext');
+    if (tone === 'bad') status.classList.add('badtext');
+    status.textContent = msg;
+  }
+
+  function titleCase(s) {
+    return s.toLowerCase().replace(/\b[a-z]/g, m => m.toUpperCase());
+  }
+
+  function normalizeText(text) {
+    let t = String(text || '');
+    t = t.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    t = t.replace(/\u00A0/g, ' ');
+    t = t.replace(/[\u2000-\u200B\u202F\u205F\u3000]/g, ' ');
+    return t;
+  }
+
+  // Smart-quote conversion is opt-in and reported.
+  // Returns { text, count } so the caller can record it.
+  function applySmartQuoteNormalization(text) {
+    if (!controls.normalizeQuotes.checked) return { text, count: 0 };
+    let count = 0;
+    const out = String(text)
+      .replace(/[\u201C\u201D]/g, m => { count += 1; return '"'; })
+      .replace(/[\u2018\u2019]/g, m => { count += 1; return "'"; });
+    return { text: out, count };
+  }
+
+  function lineMeta(line) {
+    const indentMatch = line.match(/^\s*/);
+    const indent = indentMatch ? indentMatch[0] : '';
+    return {
+      raw: line,
+      indent,
+      trimmed: line.trim()
+    };
+  }
+
+  function isDecorative(line) {
+    const stripped = line.trim();
+    if (!stripped) return false;
+    return /^[-=*_~#]{4,}$/.test(stripped);
+  }
+
+  function isLikelyBullet(line) {
+    return /^\s*([•●◦▪■\-–—*+]|\d+[.)]|[a-zA-Z][.)]|\([a-zA-Z0-9]+\))\s+/.test(line);
+  }
+
+  function cleanBulletPrefix(line) {
+    let s = line;
+    if (controls.lowerListNoise.checked) {
+      s = s.replace(/^\s*(\(?[a-zA-Z0-9]+\)?[.)]|[0-9]+[.)])\s+/, '');
+    }
+    if (controls.normalizeBullets.checked) {
+      s = s.replace(/^\s*([•●◦▪■\-–—*+])\s+/, '');
+      return '- ' + s.trim();
+    }
+    return s.trim();
+  }
+
+  function looksLikeHeader(line) {
+    const s = line.trim();
+    if (!s) return false;
+    if (s.length > 90) return false;
+    if (/[.!?]$/.test(s)) return false;
+    if (isLikelyBullet(s)) return false;
+    const letters = (s.match(/[A-Za-z]/g) || []).length;
+    const uppers = (s.match(/[A-Z]/g) || []).length;
+    if (letters && uppers / letters > 0.65) return true;
+    if (/:\s*$/.test(s)) return true;
+    return false;
+  }
+
+  function shouldJoin(prev, cur) {
+    const a = prev.trim();
+    const b = cur.trim();
+    if (!a || !b) return false;
+    if (isLikelyBullet(cur)) return false;
+    if (looksLikeHeader(cur)) return false;
+    if (/^[A-Z0-9][A-Za-z0-9'"]{0,20}\s*:/.test(b)) return false;
+    if (/[.!?;:]$/.test(a)) return false;
+    if (/^[\-\u2022•*]/.test(b)) return false;
+    if (/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(b)) return false;
+    return true;
+  }
+
+  function preprocessLines(raw) {
+    const normalized = normalizeText(raw);
+    return normalized.split('\n').map(original => {
+      const meta = lineMeta(original);
+      let working = original;
+
+      if (!controls.preserveIndent.checked && controls.trimEdges.checked) working = working.trim();
+      else if (controls.trimEdges.checked) working = working.replace(/\s+$/g, '');
+
+      if (controls.collapseSpaces.checked) {
+        if (controls.preserveIndent.checked) {
+          const m = lineMeta(working);
+          const body = m.trimmed.replace(/[ \t]+/g, ' ');
+          working = m.indent + body;
+        } else {
+          working = working.replace(/[ \t]+/g, ' ');
+        }
+      }
+
+      return {
+        original,
+        current: working,
+        trimmed: working.trim(),
+        indent: lineMeta(working).indent
+      };
+    });
+  }
+
+  function standardClean(raw) {
+    const quoteResult = applySmartQuoteNormalization(raw);
+    let lines = preprocessLines(quoteResult.text);
+    const report = {
+      decorative_removed: 0,
+      bullets_normalized: 0,
+      numbering_noise_removed: 0,
+      broken_line_joins: 0,
+      empty_lines_collapsed: 0,
+      headers_title_cased: 0,
+      quotes_normalized: quoteResult.count
+    };
+
+    if (controls.stripDecorative.checked) {
+      const before = lines.length;
+      lines = lines.filter(line => !isDecorative(line.current));
+      report.decorative_removed += (before - lines.length);
+    }
+
+    lines = lines.map(line => {
+      let current = line.current;
+      const before = current;
+      if (controls.normalizeBullets.checked || controls.lowerListNoise.checked) {
+        if (isLikelyBullet(current)) {
+          const normalized = cleanBulletPrefix(current);
+          if (controls.lowerListNoise.checked && /^\s*(\(?[a-zA-Z0-9]+\)?[.)]|[0-9]+[.)])\s+/.test(before)) {
+            report.numbering_noise_removed += 1;
+          }
+          if (normalized !== current.trim()) report.bullets_normalized += 1;
+          current = controls.preserveIndent.checked ? line.indent + normalized : normalized;
+        }
+      }
+      return { ...line, current, trimmed: current.trim(), indent: lineMeta(current).indent };
+    });
+
+    if (controls.joinBroken.checked) {
+      const merged = [];
+      for (const line of lines) {
+        if (!merged.length) {
+          merged.push({ ...line });
+          continue;
+        }
+        const prev = merged[merged.length - 1];
+        if (shouldJoin(prev.current, line.current)) {
+          prev.current = prev.current.replace(/\s+$/g, '') + ' ' + line.current.trimStart();
+          prev.trimmed = prev.current.trim();
+          prev.indent = lineMeta(prev.current).indent;
+          report.broken_line_joins += 1;
+        } else {
+          merged.push({ ...line });
+        }
+      }
+      lines = merged;
+    }
+
+    if (controls.titleCaseHeaders.checked) {
+      lines = lines.map(line => {
+        if (looksLikeHeader(line.current)) {
+          report.headers_title_cased += 1;
+          const cased = titleCase(line.current.trim());
+          return { ...line, current: controls.preserveIndent.checked ? line.indent + cased : cased, trimmed: cased };
+        }
+        return line;
+      });
+    }
+
+    if (controls.removeEmptyBursts.checked) {
+      const collapsed = [];
+      let emptyRun = 0;
+      for (const line of lines) {
+        if (!line.current.trim()) {
+          emptyRun += 1;
+          if (emptyRun <= 1) collapsed.push(line);
+          else report.empty_lines_collapsed += 1;
+        } else {
+          emptyRun = 0;
+          collapsed.push(line);
+        }
+      }
+      lines = collapsed;
+    }
+
+    return {
+      text: lines.map(line => line.current).join('\n').trim(),
+      report
+    };
+  }
+
+  function checklistMode(raw) {
+    // Narrow cleanup only — running full standardClean would invoke joinBroken,
+    // which merges short unpunctuated lines (exactly the kind of input checklist
+    // mode is for) into a single row. We want one task per line preserved.
+    const quoteResult = applySmartQuoteNormalization(raw);
+    const normalized = normalizeText(quoteResult.text);
+    let lines = normalized.split('\n');
+
+    const report = {
+      decorative_removed: 0,
+      bullets_normalized: 0,
+      numbering_noise_removed: 0,
+      empty_lines_collapsed: 0,
+      quotes_normalized: quoteResult.count,
+      checklist_rows_created: 0
+    };
+
+    // Strip decorative separators
+    if (controls.stripDecorative.checked) {
+      const before = lines.length;
+      lines = lines.filter(l => !isDecorative(l));
+      report.decorative_removed = before - lines.length;
+    }
+
+    // Trim, collapse spaces, drop empties
+    lines = lines
+      .map(l => {
+        let s = l;
+        if (controls.trimEdges.checked) s = s.trim();
+        if (controls.collapseSpaces.checked) s = s.replace(/[ \t]+/g, ' ');
+        return s;
+      })
+      .filter(Boolean);
+
+    // Normalize bullet/numbering prefixes per existing rules
+    lines = lines.map(line => {
+      if (isLikelyBullet(line)) {
+        const before = line;
+        const cleaned = cleanBulletPrefix(line);
+        if (controls.lowerListNoise.checked && /^\s*(\(?[a-zA-Z0-9]+\)?[.)]|[0-9]+[.)])\s+/.test(before)) {
+          report.numbering_noise_removed += 1;
+        }
+        if (cleaned !== line.trim()) report.bullets_normalized += 1;
+        return cleaned;
+      }
+      return line;
+    });
+
+    const out = lines.map(line => {
+      const cleaned = line.startsWith('- ') ? line.replace(/^-+\s*/, '') : line;
+      return '- [ ] ' + cleaned;
+    });
+
+    report.checklist_rows_created = out.length;
+
+    return {
+      text: out.join('\n'),
+      report
+    };
+  }
+
+  function csvishMode(raw) {
+    // Run the full toggle-respecting pipeline first so the user's rule
+    // choices actually apply in CSV-ish mode (was previously bypassed).
+    const base = standardClean(raw);
+    let lines = base.text
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    let commaRows = 0;
+    lines = lines.map(s => {
+      let out = s.replace(/[|;]/g, ',');
+      out = out.replace(/\t+/g, ',');
+      out = out.replace(/\s{2,}/g, ',');
+      out = out.replace(/\s*,\s*/g, ',');
+      out = out.replace(/,+/g, ',');
+      out = out.replace(/^,|,$/g, '');
+      if (out.includes(',')) commaRows += 1;
+      return out;
+    });
+
+    return {
+      text: lines.join('\n'),
+      report: {
+        ...base.report,
+        csv_rows: lines.length,
+        comma_rows: commaRows
+      }
+    };
+  }
+
+  function paragraphMode(raw) {
+    const quoteResult = applySmartQuoteNormalization(raw);
+    let t = normalizeText(quoteResult.text);
+    let lines = t.split('\n').map(s => s.trim());
+    const paragraphs = [];
+    let current = [];
+    let bulletBreaks = 0;
+    let decorativeRemoved = 0;
+
+    for (const line of lines) {
+      if (!line || isDecorative(line)) {
+        if (line && isDecorative(line)) decorativeRemoved += 1;
+        if (current.length) {
+          paragraphs.push(current.join(' '));
+          current = [];
+        }
+        continue;
+      }
+      if (isLikelyBullet(line) || looksLikeHeader(line)) {
+        if (current.length) {
+          paragraphs.push(current.join(' '));
+          current = [];
+        }
+        paragraphs.push(cleanBulletPrefix(line));
+        bulletBreaks += 1;
+        continue;
+      }
+      current.push(line);
+    }
+    if (current.length) paragraphs.push(current.join(' '));
+
+    // Narrow cleanup only: collapse internal repeated spaces inside each paragraph.
+    // Do NOT run full standardClean — it would re-merge paragraphs across the
+    // double-newline boundary via joinBroken / removeEmptyBursts.
+    const cleaned = paragraphs.map(p => {
+      let out = p;
+      if (controls.collapseSpaces.checked) out = out.replace(/[ \t]+/g, ' ');
+      if (controls.trimEdges.checked) out = out.trim();
+      return out;
+    }).filter(Boolean);
+
+    return {
+      text: cleaned.join('\n\n'),
+      report: {
+        decorative_removed: decorativeRemoved,
+        paragraph_blocks: cleaned.length,
+        structural_breaks_preserved: bulletBreaks,
+        quotes_normalized: quoteResult.count
+      }
+    };
+  }
+
+  // Plain-English descriptions for action keys. The JSON export keeps the
+  // structured snake_case keys; this only affects on-screen rendering.
+  const ACTION_DESCRIPTIONS = {
+    decorative_removed: n => `Removed ${n} decorative separator${n === 1 ? '' : 's'} (lines like <code>-----</code> or <code>=====</code>).`,
+    bullets_normalized: n => `Normalized ${n} bullet${n === 1 ? '' : 's'} to a single style (<code>- </code>).`,
+    numbering_noise_removed: n => `Removed leading numbering noise from ${n} line${n === 1 ? '' : 's'} (like <code>1)</code> or <code>(a)</code>).`,
+    broken_line_joins: n => `Joined ${n} wrapped line${n === 1 ? '' : 's'} that were safe to merge.`,
+    empty_lines_collapsed: n => `Collapsed ${n} extra blank line${n === 1 ? '' : 's'}.`,
+    headers_title_cased: n => `Title-cased ${n} obvious header${n === 1 ? '' : 's'}.`,
+    quotes_normalized: n => `Converted ${n} smart quote${n === 1 ? '' : 's'} to ASCII.`,
+    checklist_rows_created: n => `Built ${n} checklist row${n === 1 ? '' : 's'}.`,
+    csv_rows: n => `Produced ${n} CSV row${n === 1 ? '' : 's'}.`,
+    comma_rows: n => `${n} row${n === 1 ? '' : 's'} contain comma-separated fields.`,
+    paragraph_blocks: n => `Built ${n} paragraph block${n === 1 ? '' : 's'}.`,
+    structural_breaks_preserved: n => `Preserved ${n} structural break${n === 1 ? '' : 's'} (bullets/headers kept as their own paragraphs).`
+  };
+
+  function describeAction(key, value) {
+    const fn = ACTION_DESCRIPTIONS[key];
+    if (fn) return fn(value);
+    // Fallback for any unmapped key — readable but not pretty.
+    return `${escapeHtml(key.replace(/_/g, ' '))}: <code>${escapeHtml(String(value))}</code>`;
+  }
+
+  function buildOutput() {
+    const raw = inputText.value || '';
+    if (!raw.trim()) {
+      outputText.value = '';
+      copyBtn.disabled = true;
+      downloadBtn.disabled = true;
+      reportBtn.disabled = true;
+      planBox.innerHTML = '<div class="mini">No normalization report yet.</div>';
+      lastReport = null;
+      setStatus('Nothing to normalize yet.', 'warn');
+      refreshStats();
+      return;
+    }
+
+    const mode = modeSelect.value;
+    let result;
+    if (mode === 'checklist') result = checklistMode(raw);
+    else if (mode === 'csvish') result = csvishMode(raw);
+    else if (mode === 'paragraphs') result = paragraphMode(raw);
+    else result = standardClean(raw);
+
+    let finalText = result.text;
+    if (lineEnding.value === 'crlf') {
+      finalText = finalText.replace(/\n/g, '\r\n');
+    }
+
+    outputText.value = finalText;
+    copyBtn.disabled = !finalText.length;
+    downloadBtn.disabled = !finalText.length;
+    reportBtn.disabled = false;
+
+    lastReport = {
+      engine: 'TEXT NORMALIZATION ENGINE',
+      version: 'v3.4',
+      generated_at: new Date().toISOString(),
+      mode,
+      line_ending: lineEnding.value,
+      input_chars: raw.length,
+      output_chars: finalText.length,
+      input_lines: normalizeText(raw).split('\n').length,
+      output_lines: finalText ? finalText.split(/\r?\n/).length : 0,
+      toggles: Object.fromEntries(Object.entries(controls).map(([k, el]) => [k, !!el.checked])),
+      actions: result.report
+    };
+
+    renderPlan(lastReport);
+    setStatus('Normalization output built.', 'good');
+    refreshStats();
+  }
+
+  function renderPlan(report) {
+    const tags = [];
+    tags.push(`<span class="tag good">${escapeHtml(modeSelect.options[modeSelect.selectedIndex].text)}</span>`);
+    if (report.output_chars < report.input_chars) tags.push(`<span class="tag good">compacted</span>`);
+    else if (report.output_chars > report.input_chars) tags.push(`<span class="tag warn">expanded</span>`);
+    else tags.push(`<span class="tag warn">same-size</span>`);
+
+    const actionItems = Object.entries(report.actions)
+      .filter(([, value]) => value)
+      .map(([key, value]) => `<li>${describeAction(key, value)}</li>`)
+      .join('');
+
+    planBox.innerHTML = `
+      <div>${tags.join(' ')}</div>
+      <div class="mini" style="margin-top:8px;">Input lines: <span class="mono">${report.input_lines}</span></div>
+      <div class="mini">Output lines: <span class="mono">${report.output_lines}</span></div>
+      <div class="mini">Input chars: <span class="mono">${report.input_chars}</span></div>
+      <div class="mini">Output chars: <span class="mono">${report.output_chars}</span></div>
+      <div class="mini" style="margin-top:8px;">Normalization actions:</div>
+      ${actionItems ? `<ul>${actionItems}</ul>` : `<div class="mini">No structural action recorded beyond baseline cleanup.</div>`}
+    `;
+  }
+
+  function refreshStats() {
+    const input = inputText.value || '';
+    const output = outputText.value || '';
+    inChars.textContent = `Input: ${input.length} chars`;
+    outChars.textContent = `Output: ${output.length} chars`;
+    lineCount.textContent = `Lines: ${output ? output.split(/\r?\n/).length : 0}`;
+    const modeLabel = modeSelect.options[modeSelect.selectedIndex].text;
+    ruleMode.textContent = `Mode: ${modeLabel}`;
+    const delta = output.length - input.length;
+    const sign = delta > 0 ? '+' : '';
+    deltaPill.textContent = `Delta: ${sign}${delta} chars`;
+  }
+
+  async function copyOutput() {
+    try {
+      await navigator.clipboard.writeText(outputText.value);
+      setStatus('Copied output to clipboard.', 'good');
+    } catch (err) {
+      setStatus('Clipboard copy failed in this browser. Select and copy manually.', 'warn');
+    }
+  }
+
+  function safeBaseName(value) {
+    return (value || 'normalized-text-output')
+      .trim()
+      .replace(/[^a-zA-Z0-9._-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'normalized-text-output';
+  }
+
+  function downloadOutput() {
+    const base = safeBaseName(downloadName.value);
+    const blob = new Blob([outputText.value], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${base}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus('Downloaded .txt file.', 'good');
+  }
+
+  function downloadReport() {
+    if (!lastReport) {
+      setStatus('No report to download yet.', 'warn');
+      return;
+    }
+    const blob = new Blob([JSON.stringify(lastReport, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${safeBaseName(downloadName.value)}-report.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus('Downloaded normalization report JSON.', 'good');
+  }
+
+  function swapIO() {
+    const out = outputText.value;
+    if (!out) {
+      setStatus('No output to swap yet.', 'warn');
+      return;
+    }
+    inputText.value = out;
+    outputText.value = '';
+    copyBtn.disabled = true;
+    downloadBtn.disabled = true;
+    reportBtn.disabled = true;
+    planBox.innerHTML = '<div class="mini">No normalization report yet.</div>';
+    lastReport = null;
+    setStatus('Output moved back into input.', 'good');
+    refreshStats();
+  }
+
+  function resetAll() {
+    inputText.value = '';
+    outputText.value = '';
+    modeSelect.value = 'standard';
+    lineEnding.value = 'lf';
+    downloadName.value = 'normalized-text-output';
+    controls.trimEdges.checked = true;
+    controls.collapseSpaces.checked = true;
+    controls.normalizeBullets.checked = true;
+    controls.removeEmptyBursts.checked = true;
+    controls.stripDecorative.checked = true;
+    controls.joinBroken.checked = true;
+    controls.titleCaseHeaders.checked = false;
+    controls.lowerListNoise.checked = true;
+    controls.preserveIndent.checked = false;
+    controls.normalizeQuotes.checked = false;
+    copyBtn.disabled = true;
+    downloadBtn.disabled = true;
+    reportBtn.disabled = true;
+    planBox.innerHTML = '<div class="mini">No normalization report yet.</div>';
+    lastReport = null;
+    setStatus('Reset complete.');
+    updateModeDesc();
+    refreshStats();
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Pre-prepared sample of chaotic input that exercises every rule.
+  const SAMPLE_MESSY = `   COLMACpulse  release   notes   \n=====================\n\n\n\n• First   bullet  with  weird   spacing\n*   second bullet, different   marker\n1)   numbered  item\n( a )    parenthetical    style\n\n\n\nThis is a paragraph that\nwraps across\nseveral lines for no good\nreason.\n\nAnother paragraph: it has “smart quotes” and ‘curly apostrophes’ that some workflows can't handle.\n\n----------\n\nName, Email, Notes\nAlice    alice@x.com    fine\nBob;bob@x.com;maybe\nCarol|carol@x.com|TBD\n\n   Trailing   spaces here   \n\n\n\n`;
+
+  const MODE_DESCRIPTIONS = {
+    standard: 'Standard clean: line-by-line normalization. Spacing, bullets, separators, broken wraps.',
+    checklist: 'Checklist: every surviving line becomes <code>- [ ]</code> task row. Standard cleanup runs first.',
+    csvish: 'CSV-ish rows: standard cleanup, then collapse tabs / pipes / multi-spaces into commas. One row per line.',
+    paragraphs: 'Paragraph pack: lines join into paragraphs. Bullets and headers stay as their own blocks. Boundaries preserved.'
+  };
+
+  function loadSample() {
+    inputText.value = SAMPLE_MESSY;
+    setStatus('Sample messy text loaded. Hit Build Normalization Output.', 'good');
+    refreshStats();
+  }
+
+  function updateModeDesc() {
+    const mode = modeSelect.value;
+    modeDesc.innerHTML = MODE_DESCRIPTIONS[mode] || '';
+  }
+
+  formatBtn.addEventListener('click', buildOutput);
+  copyBtn.addEventListener('click', copyOutput);
+  downloadBtn.addEventListener('click', downloadOutput);
+  reportBtn.addEventListener('click', downloadReport);
+  sampleBtn.addEventListener('click', loadSample);
+  swapBtn.addEventListener('click', swapIO);
+  resetBtn.addEventListener('click', resetAll);
+  inputText.addEventListener('input', refreshStats);
+  modeSelect.addEventListener('change', () => { refreshStats(); updateModeDesc(); });
+  lineEnding.addEventListener('change', refreshStats);
+  Object.values(controls).forEach(el => el.addEventListener('change', refreshStats));
+
+  updateModeDesc();
+  refreshStats();
+})();
+</script>
+<script>
+/* DEMO WRAPPER — runs the real engine, gates the ownership features, drives the buy */
+(function(){
+  function $(id){return document.getElementById(id);}
+  var input=$('inputText'), sample=$('sampleBtn'), build=$('formatBtn'), buy=$('buyBtn');
+  if(!input || !build) return;
+
+  // cap input so the demo is a taster, not the product
+  input.setAttribute('maxlength','2000');
+
+  function bumpBuy(){
+    if(!buy) return;
+    buy.style.transform='scale(1.08)';
+    setTimeout(function(){buy.style.transform='';},220);
+    buy.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  // land pre-run on the sample so the visitor sees before/after immediately
+  try{ if(sample) sample.click(); build.click(); }catch(e){}
+
+  // gate the "own it" features: clone the buttons to strip the tool's handlers, then route to buy
+  ['downloadBtn','reportBtn'].forEach(function(id){
+    var b=$(id); if(!b) return;
+    var c=b.cloneNode(true); c.disabled=false;
+    c.title='In the file you buy — $19, offline, no limits.';
+    b.parentNode.replaceChild(c,b);
+    c.addEventListener('click', function(e){ e.preventDefault(); bumpBuy(); });
+  });
+
+  // one-line note under the output controls
+  var dlNow=$('downloadBtn');
+  if(dlNow && dlNow.parentNode){
+    var n=document.createElement('div'); n.className='demo-note';
+    n.textContent='Download · audit report · no character limit — in the file you buy.';
+    dlNow.parentNode.appendChild(n);
+  }
+
+  // buy button — checkout URL gets pasted in once the store activates
+  if(buy) buy.addEventListener('click', function(e){
+    var href=buy.getAttribute('data-href');
+    if(href){ window.location.href=href; return; }
+    e.preventDefault();
+    var t=buy.textContent; buy.textContent='Checkout opens at launch';
+    setTimeout(function(){ buy.textContent=t; },1600);
+  });
+})();
+</script>
+</body>
+</html>

@@ -123,7 +123,19 @@
   .buy:hover{background:var(--a);color:#06090c}
   .buy.pending{border-color:var(--line);color:var(--dim)}
   .cacts{display:flex;gap:10px;align-items:center}
-  .try{font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--a);color:#06090c;border:1px solid var(--a);padding:7px 12px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap}
+    .try{font:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--a);color:#06090c;border:1px solid var(--a);padding:7px 12px;border-radius:8px;font-weight:700;white-space:nowrap;cursor:pointer;line-height:1}
+  .dm{position:fixed;inset:0;z-index:1000;display:none}
+  .dm.open{display:block}
+  .dm-back{position:absolute;inset:0;background:rgba(2,6,10,.74);backdrop-filter:blur(3px)}
+  .dm-box{position:absolute;inset:clamp(10px,3.5vw,46px);background:#0a0f14;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 90px rgba(0,0,0,.65)}
+  .dm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);background:#0c1218}
+  .dm-title{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--a,#9fe8d4);font-weight:700}
+  .dm-actions{display:flex;align-items:center;gap:14px}
+  .dm-open{font-size:12px;color:var(--dim);text-decoration:none}
+  .dm-open:hover{color:var(--ink)}
+  .dm-close{background:none;border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;line-height:1}
+  .dm-close:hover{border-color:var(--a,#9fe8d4)}
+  #demoFrame{flex:1;width:100%;border:0;background:#0f1115}
   .try:hover{filter:brightness(1.08)}
 
   /* work / projects */
@@ -406,7 +418,7 @@ const buyAttrs = u => u ? `href="${u}" target="_blank" rel="noopener"` :
 const card = p => `<div class="card" style="--a:${p.a}">
     <div class="cname">${p.name}</div><div class="csub">${p.sub}</div>
     <div class="cfoot"><span class="price">${priceHTML(p.price)}</span>
-      <span class="cacts">${p.demo?`<a class="try" style="--a:${p.a}" href="${p.demo}" target="_blank" rel="noopener">Try it live →</a>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
+      <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
 
 document.getElementById('engine-grid').innerHTML = ENGINES.map(card).join('');
 document.getElementById('scope-grid').innerHTML  = SCOPES.map(card).join('');
@@ -477,6 +489,41 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   }
   addEventListener('resize',size);
   requestAnimationFrame(function(){size(); reduce?frame(0):requestAnimationFrame(frame);});
+})();
+</script>
+<div id="demoModal" class="dm" aria-hidden="true">
+  <div class="dm-back"></div>
+  <div class="dm-box">
+    <div class="dm-head">
+      <span class="dm-title">Live demo</span>
+      <div class="dm-actions">
+        <a class="dm-open" target="_blank" rel="noopener">Open full ↗</a>
+        <button type="button" class="dm-close" aria-label="Close demo">✕</button>
+      </div>
+    </div>
+    <iframe id="demoFrame" title="Live tool demo"></iframe>
+  </div>
+</div>
+<script>
+(function(){
+  var m=document.getElementById('demoModal'), fr=document.getElementById('demoFrame');
+  if(!m||!fr) return;
+  function openD(url,name,accent){
+    m.querySelector('.dm-title').textContent=(name||'Live')+' — live demo';
+    m.style.setProperty('--a', accent||'#9fe8d4');
+    m.querySelector('.dm-open').href=url;
+    fr.src=url; m.classList.add('open'); m.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closeD(){ m.classList.remove('open'); m.setAttribute('aria-hidden','true');
+    fr.src='about:blank'; document.body.style.overflow=''; }
+  document.addEventListener('click', function(e){
+    var t=e.target.closest ? e.target.closest('.try') : null;
+    if(t && t.getAttribute('data-demo')){ e.preventDefault();
+      openD(t.getAttribute('data-demo'), t.getAttribute('data-name'), t.style.getPropertyValue('--a')); return; }
+    if(e.target.closest && (e.target.closest('.dm-close') || e.target.classList.contains('dm-back'))) closeD();
+  });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && m.classList.contains('open')) closeD(); });
 })();
 </script>
 </body>
