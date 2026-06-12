@@ -211,10 +211,10 @@
 </div>
 <div class="grid-bg"></div>
 
-<!-- Continuity Instrument: stationary ambient glyph filling the lower-right negative space -->
+<!-- Continuity Instrument: styles only here; the block itself lives down by the footer -->
 <style>
-  #continuity-amb{position:fixed;right:4vw;top:12vh;z-index:0;pointer-events:none;
-    width:min(52vh,50vw);opacity:.85;
+  #continuity-amb{position:relative;z-index:1;margin:46px auto 8px;pointer-events:none;
+    width:min(480px,80vw);opacity:.92;
     --ci-line:rgba(217,255,235,.6);--ci-soft:rgba(217,255,235,.22);
     --ci-accent:#9ef4c1;--ci-warn:#ffd48a}
   #continuity-amb svg{display:block;width:100%;height:auto;overflow:visible}
@@ -235,27 +235,11 @@
   #continuity-amb .ci-words .w.on.hot{color:var(--ci-warn);text-shadow:0 0 12px rgba(255,212,138,.5)}
   #continuity-amb .ci-words .sep{width:16px;height:1px;background:rgba(171,196,186,.16);margin:0 9px}
   @media(max-width:760px){
-    #continuity-amb{right:4vw;top:14vh;width:min(40vh,64vw);opacity:.6}
+    #continuity-amb{width:min(320px,86vw)}
     #continuity-amb .ci-words{font-size:8px;letter-spacing:.14em}
     #continuity-amb .ci-words .sep{width:8px;margin:0 5px}}
   @media(prefers-reduced-motion:reduce){#continuity-amb .ci-ring{animation:none}}
 </style>
-<div id="continuity-amb" aria-hidden="true">
-  <svg viewBox="0 0 320 320">
-    <circle class="ci-ring r3" cx="160" cy="160" r="112"/>
-    <circle class="ci-ring r2" cx="160" cy="160" r="76"/>
-    <circle class="ci-ring r1" cx="160" cy="160" r="38"/>
-    <g id="ci-ticks"></g>
-    <g id="ci-spikes"></g>
-    <circle class="ci-core" cx="160" cy="160" r="14"/>
-  </svg>
-  <div class="ci-words">
-    <span class="w" data-phase="baseline">Baseline</span><span class="sep"></span>
-    <span class="w" data-phase="deviation">Deviation</span><span class="sep"></span>
-    <span class="w" data-phase="severity">Severity</span><span class="sep"></span>
-    <span class="w" data-phase="claim">Claim</span>
-  </div>
-</div>
 
 <header class="hdr">
   <div class="hbar">
@@ -387,6 +371,24 @@
       <div class="p"><div class="pk">Yours</div><h4>Buy once, keep forever.</h4><p>No subscription, no login, no expiry. The file you download is the product. It can't be turned off from somewhere else.</p></div>
     </div>
   </section>
+
+  <!-- Continuity Instrument: lives here at the bottom of the page, centered -->
+  <div id="continuity-amb" aria-hidden="true">
+    <svg viewBox="0 0 320 320">
+      <circle class="ci-ring r3" cx="160" cy="160" r="112"/>
+      <circle class="ci-ring r2" cx="160" cy="160" r="76"/>
+      <circle class="ci-ring r1" cx="160" cy="160" r="38"/>
+      <g id="ci-ticks"></g>
+      <g id="ci-spikes"></g>
+      <circle class="ci-core" cx="160" cy="160" r="14"/>
+    </svg>
+    <div class="ci-words">
+      <span class="w" data-phase="baseline">Baseline</span><span class="sep"></span>
+      <span class="w" data-phase="deviation">Deviation</span><span class="sep"></span>
+      <span class="w" data-phase="severity">Severity</span><span class="sep"></span>
+      <span class="w" data-phase="claim">Claim</span>
+    </div>
+  </div>
 
   <footer>
     <div class="fsig"></div>
