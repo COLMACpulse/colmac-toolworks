@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FIELDSCOPE</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>FIELDSCOPE</h1>
+        <p class="sub">Offline-first SAR core with environment awareness, ACK visuals, packet aging, exposure-clock decision support, agency coordination, sector discipline, truth hierarchy, and a phone radio gateway layer with route governance, congestion control, and adapter handshake state.</p>
+      </div>
+      
+      <div class="demo-controls">
+        <button class="action" id="startDemoBtn">GUIDED DEMO</button>
+        <button class="action ghost" id="autoPlayDemoBtn">AUTO PLAY</button>
+        <button class="action ghost" id="nextDemoStepBtn">NEXT STEP</button>
+        <button class="action ghost" id="badDemoBtn">BAD DEMO</button>
+        <button class="action ghost" id="resetDemoStateBtn">RESET STATE</button>
+        <button class="action ghost" id="exitDemoBtn">EXIT DEMO</button>
+      </div>
+
+      <div class="status-stack">
+        <div class="pill" id="modePill">MODE: SAR</div>
+        <div class="pill accent3" id="rolePill">ROLE: FIELD</div>
+        <div class="pill accent2" id="linkPill">LINK: LOCAL ONLY</div>
+        <div class="pill" id="gatewayPill">GATEWAY: OFF</div>
+        <div class="pill" id="queuePill">QUEUE: 0</div>
+      </div>
+    </header>
+
+    <section class="warning">
+      <strong>Assistive system only.</strong>
+      This build adds comms discipline. Packets are prioritized, queued, acknowledged, retried on a resend schedule, and can be flushed through a gateway adapter when a link exists.
+    </section>
+
+    <section class="main-grid">
+      <aside class="panel left-rail">
+        <div class="panel-head">
+          <h2>Identity + Mission</h2>
+          <span class="tiny">Comms aware</span>
+        </div>
+
+        <div class="grid two">
+          <label><span>Callsign</span><input id="callsign" type="text" placeholder="ALPHA-1" /></label>
+          <label><span>Role</span><select id="roleSelect"><option value="field">Field</option><option value="lead">Lead</option></select></label>
+        </div>
+
+        <div class="grid two">
+          <label><span>Mode</span><select id="modeSelect"><option value="sar">SAR</option><option value="training">Training</option></select></label>
+          <label><span>Subject Type</span><select id="subjectType"><option value="child">Child</option><option value="adult">Adult</option><option value="injured_adult">Injured Adult</option><option value="elderly">Elderly</option><option value="unknown">Unknown</option></select></label>
+        </div>
+
+        <div class="grid two">
+          <label><span>Last Known Point</span><input id="lkp" type="text" placeholder="trailhead / wash / parking lot / sector" /></label>
+          <label><span>Elapsed Time (hrs)</span><input id="elapsedHours" type="number" min="0" step="0.25" value="2" /></label>
+        </div>
+
+        <label><span>Context Notes</span><textarea id="contextNotes" rows="4" placeholder="medical concerns, behavior, hazards, route intent, team notes..."></textarea></label>
+
+        <div class="mini-section environment-section">
+          <div class="section-head"><h3>Environment Layer</h3><span class="tiny">Weather + fallback</span></div>
+          <div class="button-row">
+            <button class="action" id="fetchWeatherBtn">Fetch Weather</button>
+            <button class="action ghost" id="applyManualEnvBtn">Apply Manual</button>
+          </div>
+          <div class="grid two">
+            <label><span>Temp °F</span><input id="manualTempInput" type="number" step="1" value="58" /></label>
+            <label><span>Wind mph</span><input id="manualWindInput" type="number" step="1" value="8" /></label>
+          </div>
+          <div class="grid two">
+            <label><span>Precipitation</span>
+              <select id="manualPrecipSelect">
+                <option value="none">None</option>
+                <option value="light">Light rain</option>
+                <option value="heavy">Heavy rain</option>
+                <option value="snow">Snow / freezing</option>
+              </select>
+            </label>
+            <label><span>Light State</span>
+              <select id="manualLightSelect">
+                <option value="day">Day</option>
+                <option value="dusk">Dusk</option>
+                <option value="night">Night</option>
+              </select>
+            </label>
+          </div>
+          <div id="environmentBox" class="result-card small">No weather snapshot yet. Use live fetch or manual conditions.</div>
+          <div id="conditionFlagsBox" class="result-card small">Condition flags will appear here.</div>
+          <div id="exposureClockBox" class="result-card small">Exposure clock idle.</div>
+        </div>
+
+        <div class="mini-section time-pressure-section">
+          <div class="section-head"><h3>Time Pressure</h3><span class="tiny">Live urgency</span></div>
+          <div id="timePressureBox" class="result-card small">Time pressure panel idle.</div>
+        </div>
+
+
+
+        <div class="button-row">
+          <button class="action ghost" id="recomputeBtn">Recompute Move</button>
+          <button class="action ghost" id="clearMissionBtn">Clear Mission</button>
+        </div>
+
+        <div class="mini-section">
+          <div class="section-head"><h3>GPS + Markers</h3><span class="tiny">Local truth</span></div>
+          <div class="button-row">
+            <button class="action" id="startGpsBtn">Start GPS</button>
+            <button class="action ghost" id="stopGpsBtn">Stop GPS</button>
+            <button class="action ghost" id="dropMarkerBtn">Drop Marker</button>
+          </div>
+          <div id="gpsReadout" class="result-card small">GPS idle.</div>
+        </div>
+
+        <div class="mini-section">
+          <div class="section-head"><h3>Gateway Adapter</h3><span class="tiny">Store-and-forward</span></div>
+          <label><span>Link State</span><select id="linkStateSelect"><option value="local_only">Local only</option><option value="peer">Peer</option><option value="sat_gateway">Sat gateway</option><option value="backhaul">Backhaul</option></select></label>
+          <label><span>Gateway Adapter</span><select id="gatewayAdapterSelect"><option value="none">None</option><option value="generic_sat_modem">Generic Sat Modem</option><option value="field_hotspot">Field Hotspot</option><option value="command_vehicle">Command Vehicle</option></select></label>
+          <div class="button-row">
+            <button class="action" id="gatewayModeBtn">Toggle Gateway Mode</button>
+            <button class="action ghost" id="flushQueueBtn">Flush Queue</button>
+          </div>
+          <div id="gatewayBox" class="result-card small">Gateway mode off. Adapter inactive.</div>
+        </div>
+
+        <div class="mini-section">
+          <div class="section-head"><h3>ACK / RESEND</h3><span class="tiny">Queue discipline</span></div>
+          <div class="grid two">
+            <label><span>Resend Window (sec)</span><input id="resendWindowInput" type="number" min="5" step="1" value="20" /></label>
+            <label><span>Max Retries</span><input id="maxRetriesInput" type="number" min="1" step="1" value="4" /></label>
+          </div>
+          <div class="button-row">
+            <button class="action ghost" id="runResendSweepBtn">Run Resend Sweep</button>
+            <button class="action ghost" id="ackTopBtn">ACK Top Packet</button>
+          </div>
+          <div id="ackBox" class="result-card small">ACK lane idle.</div>
+        </div>
+
+        <div class="mini-section">
+          <div class="section-head"><h3>Session Memory</h3><span class="tiny">Save / load</span></div>
+          <div class="button-row stacked">
+            <button class="action ghost full" id="saveSessionBtn">Save Session File</button>
+            <label class="file-label"><input type="file" id="loadSessionInput" accept=".json,application/json" hidden /><span class="action ghost full">Load Session File</span></label>
+          </div>
+          <div id="sessionBox" class="result-card small">No saved session loaded.</div>
+        </div>
+      </aside>
+
+      <main class="panel center-stage">
+        <section class="hero-actions">
+          <button class="big-action scan" id="scanBtn"><span class="big">🎤 SCAN</span><span class="small">12 second audio sweep</span></button>
+          <button class="big-action view" id="viewBtn"><span class="big">📷 VIEW</span><span class="small">Camera assist + capture</span></button>
+          <button class="big-action move" id="moveBtn"><span class="big">🧭 MOVE</span><span class="small">Interpret + commit next move</span></button>
+        </section>
+
+        <section class="signal-row">
+          <div class="subpanel">
+            <div class="subhead"><h3>Signal Console</h3><div class="inline-pills"><span class="mini-pill" id="audioState">idle</span><span class="mini-pill" id="headingState">heading --</span><span class="mini-pill" id="cameraState">camera off</span></div></div>
+            <div class="meter-wrap"><div class="meter" id="audioMeter"><span></span></div><div class="meter-labels"><span>Quiet</span><span>Signal Energy</span><span>Strong</span></div></div>
+            <div class="stats-grid">
+              <div class="stat"><span>RMS</span><strong id="statRms">--</strong></div>
+              <div class="stat"><span>Peak Hz</span><strong id="statHz">--</strong></div>
+              <div class="stat"><span>ZCR</span><strong id="statZcr">--</strong></div>
+              <div class="stat"><span>Class</span><strong id="statClass">--</strong></div>
+            </div>
+            <div class="result-card" id="audioInterpretation">No scan yet.</div>
+            <div id="signalTimeline" class="timeline"></div>
+          </div>
+
+          <div class="subpanel camera-panel">
+            <div class="subhead"><h3>Camera Assist</h3><div class="inline-pills"><span class="mini-pill" id="visualBand">visual idle</span></div></div>
+            <div class="camera-wrap"><video id="video" playsinline autoplay muted></video><canvas id="overlay"></canvas><div class="camera-overlay-text" id="cameraOverlayText">Camera standby</div></div>
+            <div class="button-row">
+              <button class="action ghost" id="startCameraBtn">Start Camera</button>
+              <button class="action ghost" id="captureBtn">Capture Frame</button>
+              <button class="action ghost" id="stopCameraBtn">Stop Camera</button>
+            </div>
+            <div class="result-card" id="visualInterpretation">No visual capture yet.</div>
+            <div class="camera-tags" id="cameraTags"></div>
+          </div>
+        </section>
+
+        <section class="map-row">
+          <div class="subpanel">
+            <div class="subhead"><h3>Ops Map</h3><div class="inline-pills"><span class="mini-pill" id="mapState">local basemap</span><span class="mini-pill accent" id="clusterState">no clusters</span></div></div>
+            <canvas id="signalMap" class="signal-map"></canvas>
+            <div class="button-row">
+              <button class="action ghost" id="zoomInBtn">Zoom In</button>
+              <button class="action ghost" id="zoomOutBtn">Zoom Out</button>
+              <button class="action ghost" id="recenterBtn">Recenter</button>
+              <button class="action ghost" id="runClusterBtn">Run Clustering</button>
+            </div>
+          </div>
+
+          <div class="subpanel">
+            <div class="subhead"><h3>Fusion + Queue State</h3><div class="inline-pills"><span class="mini-pill accent" id="fusionState">awaiting scans</span></div></div>
+            <div id="fusionBox" class="result-card small">No fusion packet yet.</div>
+            <div id="queueBox" class="result-card small">Queue empty.</div>
+            <div class="button-row">
+              <button class="action ghost" id="runFusionBtn">Run Fusion</button>
+              <button class="action ghost" id="replayBtn">Replay Timeline</button>
+            </div>
+            <div id="replayTimeline" class="timeline compact"></div>
+          </div>
+        </section>
+
+        <section class="move-commit-row">
+          <div class="subpanel move-core">
+            <div class="subhead"><h3>MOVE Packet</h3><div class="inline-pills"><span class="mini-pill accent" id="decisionState">awaiting input</span></div></div>
+            <div class="move-core-grid">
+              <div class="confidence-card">
+                <div class="confidence-ring" id="confidenceRing"><span id="confidenceValue">0.00</span></div>
+                <div><div class="label">Confidence</div><div class="value" id="confidenceBand">LOW</div><div class="micro">Rounded, conservative, assistive only.</div></div>
+              </div>
+              <div class="move-card" id="moveOutput">No decision packet yet. Press <strong>MOVE</strong> after setup or a scan.</div>
+            </div>
+          </div>
+
+          <div class="subpanel next-lane">
+            <div class="subhead"><h3>Commit Lane</h3><div class="inline-pills"><span class="mini-pill" id="commitState">open</span></div></div>
+            <label><span>Chosen Next Move</span><textarea id="chosenMove" rows="5" placeholder="Commit the team’s actual next move here..."></textarea></label>
+            <div class="button-row">
+              <button class="action" id="commitMoveBtn">Commit Move</button>
+              <button class="action ghost" id="clearCommitBtn">Clear</button>
+            </div>
+            <div id="commitHistory" class="timeline compact"></div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="panel right-rail">
+        <div class="panel-head"><h2>Comms Discipline</h2><span class="tiny">Low-bandwidth packets</span></div>
+
+        <div class="result-card small" id="roleBox">Role lane not initialized.</div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Short Message Lane</h3></div>
+          <label><span>Message</span><textarea id="messageInput" rows="3" placeholder="Short message for the team..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="sendMessageBtn">Queue Message</button>
+            <button class="action ghost" id="clearMessageBtn">Clear</button>
+          </div>
+          <div id="messageLane" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Queue Board</h3></div>
+          <div id="queueBoard" class="timeline"></div>
+        </div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Peer State</h3></div>
+          <div id="unitBoard" class="timeline"></div>
+        </div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Command Summary</h3></div>
+          <div id="commandSummary" class="result-card small">No peer data yet.</div>
+        </div>
+
+        <div class="proof-box agency-box">
+          <div class="subhead tight"><h3>Agency Coordination Lane</h3></div>
+          <div class="grid two">
+            <label><span>Agency</span><input id="agencyNameInput" type="text" placeholder="Sheriff Air Support / Fire / Park Rangers / Coast Guard" /></label>
+            <label><span>Contact Channel</span><input id="agencyContactInput" type="text" placeholder="Dispatch / sat gateway / phone / command post" /></label>
+          </div>
+          <div class="grid two">
+            <label><span>Message Type</span>
+              <select id="agencyMessageTypeSelect">
+                <option value="request_assistance">Request Assistance</option>
+                <option value="request_cooperation">Request Cooperation</option>
+                <option value="send_update">Send Update</option>
+                <option value="resource_need">Resource Need</option>
+              </select>
+            </label>
+            <label><span>Urgency</span>
+              <select id="agencyUrgencySelect">
+                <option value="routine">Routine</option>
+                <option value="elevated">Elevated</option>
+                <option value="serious">Serious</option>
+                <option value="critical">Critical</option>
+              </select>
+            </label>
+          </div>
+          <label><span>Requested Help / Cooperation</span><textarea id="agencyRequestInput" rows="3" placeholder="Air support, K9, ground teams, thermal sweep, water access, medical standby, perimeter cooperation..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="generateAgencyBtn">Generate Packet</button>
+            <button class="action ghost" id="queueAgencyBtn">Queue Packet</button>
+            <button class="action ghost" id="exportAgencyBtn">Export TXT</button>
+          </div>
+          <div id="agencyPreviewBox" class="result-card small">No agency coordination packet generated yet.</div>
+        </div>
+
+        <div class="proof-box sector-box">
+          <div class="subhead tight"><h3>Sector Discipline</h3></div>
+          <div class="grid two">
+            <label><span>Sector ID</span><input id="sectorIdInput" type="text" placeholder="A-1 / Wash East / Ridge North" /></label>
+            <label><span>Status</span>
+              <select id="sectorStatusSelect">
+                <option value="assigned">Assigned</option>
+                <option value="active">Active</option>
+                <option value="cleared">Cleared</option>
+                <option value="hold">Hold</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Assigned To</span><input id="sectorAssignedInput" type="text" placeholder="ALPHA-1 / TEAM RED" /></label>
+            <label><span>Priority</span>
+              <select id="sectorPrioritySelect">
+                <option value="routine">Routine</option>
+                <option value="elevated">Elevated</option>
+                <option value="critical">Critical</option>
+              </select>
+            </label>
+          </div>
+          <label><span>Sector Note</span><textarea id="sectorNoteInput" rows="2" placeholder="Drainage sweep, thermal pass, brush line, duplicate risk, access blocked..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="addSectorBtn">Add / Update Sector</button>
+            <button class="action ghost" id="clearSectorsBtn">Clear Sectors</button>
+          </div>
+          <div id="sectorBoard" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box truth-box">
+          <div class="subhead tight"><h3>Truth Hierarchy</h3></div>
+          <div id="truthBox" class="result-card small">Truth hierarchy not computed yet.</div>
+          <div id="truthBoard" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box gateway-layer-box">
+          <div class="subhead tight"><h3>Phone Radio Gateway Layer</h3></div>
+          <div class="grid two">
+            <label><span>Gateway Route</span>
+              <select id="gatewayRouteSelect">
+                <option value="local_only">Local Only</option>
+                <option value="adapter_only">Adapter Only</option>
+                <option value="radio_net">Radio Net</option>
+                <option value="command_gateway">Command Gateway</option>
+              </select>
+            </label>
+            <label><span>Transport</span>
+              <select id="gatewayTransportSelect">
+                <option value="ble">BLE</option>
+                <option value="wired">Wired</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Adapter ID</span><input id="adapterIdInput" type="text" placeholder="RADIO-BRIDGE-01" /></label>
+            <label><span>Radio Profile</span>
+              <select id="radioProfileSelect">
+                <option value="generic_packet">Generic Packet</option>
+                <option value="vhf_team">VHF Team</option>
+                <option value="uhf_ops">UHF Ops</option>
+                <option value="command_vehicle">Command Vehicle</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Battery %</span><input id="adapterBatteryInput" type="number" min="0" max="100" step="1" value="82" /></label>
+            <label><span>Radio Path</span>
+              <select id="radioPathSelect">
+                <option value="unavailable">Unavailable</option>
+                <option value="staging">Staging</option>
+                <option value="available">Available</option>
+              </select>
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="action" id="connectAdapterBtn">Connect Adapter</button>
+            <button class="action ghost" id="disconnectAdapterBtn">Disconnect</button>
+            <button class="action ghost" id="applyGatewayConfigBtn">Apply Config</button>
+          </div>
+          <div id="gatewayStatusCard" class="result-card small">Gateway adapter not initialized.</div>
+          <div id="adapterContractBox" class="result-card small">Adapter contract not shown yet.</div>
+        </div>
+
+        <div class="proof-box route-governor-box">
+          <div class="subhead tight"><h3>Route Governor</h3></div>
+          <div class="grid two">
+            <label><span>Default Route Policy</span>
+              <select id="defaultRoutePolicySelect">
+                <option value="auto">Auto</option>
+                <option value="local_only">Local Only</option>
+                <option value="adapter_only">Adapter Only</option>
+                <option value="radio_net">Radio Net</option>
+                <option value="command_gateway">Command Gateway</option>
+              </select>
+            </label>
+            <label><span>Congestion Mode</span>
+              <select id="congestionModeSelect">
+                <option value="balanced">Balanced</option>
+                <option value="protect_high_priority">Protect High Priority</option>
+                <option value="strict_radio">Strict Radio</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Max Radio Payload (bytes)</span><input id="maxRadioPayloadInput" type="number" min="40" step="10" value="180" /></label>
+            <label><span>Drop Threshold (queue depth)</span><input id="dropThresholdInput" type="number" min="3" step="1" value="12" /></label>
+          </div>
+          <div id="routeGovernorBox" class="result-card small">Route governor not configured yet.</div>
+        </div>
+
+        <div class="proof-box handshake-box">
+          <div class="subhead tight"><h3>Adapter Handshake State</h3></div>
+          <div class="button-row">
+            <button class="action ghost" id="handshakeAdvanceBtn">Advance Handshake</button>
+            <button class="action ghost" id="handshakeResetBtn">Reset</button>
+          </div>
+          <div id="handshakeBox" class="result-card small">Handshake idle.</div>
+        
+        <div class="proof-box ack-provenance-box">
+          <div class="subhead tight"><h3>ACK Provenance + Trust</h3></div>
+          <div class="grid two">
+            <label><span>Source ID</span><input id="provSourceInput" type="text" placeholder="ALPHA-2 / COMMAND NODE" /></label>
+            <label><span>Route</span>
+              <select id="provRouteSelect">
+                <option value="radio_net">Radio Net</option>
+                <option value="command_gateway">Command Gateway</option>
+                <option value="adapter_only">Adapter Only</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Trust Level</span>
+              <select id="provTrustSelect">
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label><span>Latency (sec)</span><input id="provLatencyInput" type="number" min="0" value="12" /></label>
+          </div>
+          <div class="button-row">
+            <button class="action" id="injectAckBtn">Inject ACK</button>
+          </div>
+          <div id="provBox" class="result-card small">No ACK provenance recorded.</div>
+        </div>
+
+        <div class="proof-box trust-governor-box">
+          <div class="subhead tight"><h3>Hard Trust Governor</h3></div>
+          <div class="grid two">
+            <label><span>Sector Clear Threshold</span><input id="sectorClearTrustInput" type="number" min="0" max="10" step="0.5" value="4.0" /></label>
+            <label><span>Stale ACK Threshold (sec)</span><input id="staleAckInput" type="number" min="10" step="5" value="60" /></label>
+          </div>
+          <div class="grid two">
+            <label><span>Conflict Delta Threshold</span><input id="conflictDeltaInput" type="number" min="0.1" step="0.1" value="1.5" /></label>
+            <label><span>Trusted Source Promote Threshold</span><input id="promoteTrustInput" type="number" min="0" max="10" step="0.5" value="4.0" /></label>
+          </div>
+          <div class="button-row">
+            <button class="action" id="runTrustGovernorBtn">Run Governor</button>
+          </div>
+          <div id="trustGovernorBox" class="result-card small">Trust governor idle.</div>
+          <div id="trustDecisionBoard" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box trust-registry-box">
+          <div class="subhead tight"><h3>Source Allowlist / Trust Registry</h3></div>
+          <div class="grid two">
+            <label><span>Source ID</span><input id="registrySourceInput" type="text" placeholder="ALPHA-2 / COMMAND NODE / SHERIFF AIR" /></label>
+            <label><span>Allowlist Status</span>
+              <select id="registryAllowSelect">
+                <option value="allowed">Allowed</option>
+                <option value="restricted">Restricted</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Trust Class</span>
+              <select id="registryTrustSelect">
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label><span>Source Class</span>
+              <select id="registryClassSelect">
+                <option value="command">Command</option>
+                <option value="team">Team</option>
+                <option value="agency">Agency</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </label>
+          </div>
+          <label><span>Registry Note</span><textarea id="registryNoteInput" rows="2" placeholder="Trusted command truck, intermittent relay, unverified volunteer source..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="addRegistryBtn">Add / Update Source</button>
+            <button class="action ghost" id="clearRegistryBtn">Clear Registry</button>
+          </div>
+          <div id="trustRegistryBoard" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box lock-visibility-box">
+          <div class="subhead tight"><h3>Decision Lock Visibility</h3></div>
+          <div id="decisionLockMapBox" class="result-card small">No decision-lock overlay active.</div>
+          <div id="decisionLockSectorBox" class="result-card small">No sector lock status yet.</div>
+        </div>
+
+        <div class="proof-box track-decay-box">
+          <div class="subhead tight"><h3>Team Signal Decay + Confidence</h3></div>
+          <div class="grid two">
+            <label><span>Callsign</span><input id="teamSignalCallsignInput" type="text" placeholder="ALPHA-2" /></label>
+            <label><span>Source Type</span>
+              <select id="teamSignalSourceTypeSelect">
+                <option value="tracking">Tracking</option>
+                <option value="radio_direct">Radio (Direct)</option>
+                <option value="radio_relay">Radio (Relay)</option>
+                <option value="visual">Visual</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid two">
+            <label><span>Source ID</span><input id="teamSignalSourceIdInput" type="text" placeholder="ALPHA-2 / COMMAND NODE" /></label>
+            <label><span>Minutes Since Seen</span><input id="teamSignalMinutesInput" type="number" min="0" step="1" value="3" /></label>
+          </div>
+          <label><span>Note</span><textarea id="teamSignalNoteInput" rows="2" placeholder="tracking ping, direct radio confirm, visual contact, intermittent relay..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="addTeamSignalBtn">Add / Update Team Signal</button>
+            <button class="action ghost" id="radioConfirmBtn">Radio Confirm</button>
+            <button class="action ghost" id="clearTeamSignalsBtn">Clear Signals</button>
+          </div>
+          <div id="teamSignalBoard" class="timeline"></div>
+        </div>
+
+        <div class="proof-box sector-risk-box">
+          <div class="subhead tight"><h3>Sector Risk Coupling</h3></div>
+          <div id="sectorRiskBox" class="result-card small">Sector risk not computed yet.</div>
+        </div>
+
+        <div class="proof-box gps-bridge-box">
+          <div class="subhead tight"><h3>GPS Plotting + Bridge Export</h3></div>
+          <div class="grid two">
+            <label><span>Latitude (optional)</span><input id="teamSignalLatInput" type="number" step="0.000001" placeholder="32.754210" /></label>
+            <label><span>Longitude (optional)</span><input id="teamSignalLonInput" type="number" step="0.000001" placeholder="-116.997430" /></label>
+          </div>
+          <div class="button-row">
+            <button class="action ghost" id="exportGpxBtn">Export GPX</button>
+            <button class="action ghost" id="exportGeoJsonBtn">Export GeoJSON</button>
+          </div>
+          <div id="bridgeExportBox" class="result-card small">No bridge export yet.</div>
+        </div>
+
+        <div class="proof-box decay-live-box">
+          <div class="subhead tight"><h3>Live Decay Timer</h3></div>
+          <div class="button-row">
+            <button class="action" id="startDecayClockBtn">Start Clock</button>
+            <button class="action ghost" id="stopDecayClockBtn">Stop Clock</button>
+          </div>
+          <div id="decayClockBox" class="result-card small">Decay clock idle.</div>
+        </div>
+
+        <div class="proof-box aar-box">
+          <div class="subhead tight"><h3>After-Action Report</h3></div>
+          <label><span>AAR Title</span><input id="aarTitleInput" type="text" placeholder="Mission review / operational summary" /></label>
+          <label><span>AAR Notes</span><textarea id="aarNotesInput" rows="3" placeholder="What worked, what degraded, what needs follow-up..."></textarea></label>
+          <div class="button-row">
+            <button class="action" id="generateAarBtn">Generate AAR</button>
+            <button class="action ghost" id="exportAarBtn">Export TXT</button>
+          </div>
+          <div id="aarBox" class="result-card small">No after-action report generated yet.</div>
+        </div>
+
+        <div class="proof-box import-tuning-box">
+          <div class="subhead tight"><h3>Field Mapping Import / Export Tuning</h3></div>
+          <div class="button-row">
+            <label class="file-label">
+              <input type="file" id="importGeoJsonInput" accept=".json,.geojson,application/geo+json,application/json" hidden />
+              <span class="action ghost">Import GeoJSON</span>
+            </label>
+            <label class="file-label">
+              <input type="file" id="importGpxInput" accept=".gpx,.xml,application/gpx+xml,text/xml,application/xml" hidden />
+              <span class="action ghost">Import GPX</span>
+            </label>
+            <button class="action ghost" id="exportMappingBundleBtn">Export Mapping Bundle</button>
+          </div>
+          <div id="mappingTuningBox" class="result-card small">No field-mapping import/export activity yet.</div>
+        </div>
+
+        <div class="proof-box polygon-shade-box">
+          <div class="subhead tight"><h3>Polygon Sector Shading</h3></div>
+          <label><span>Sector Polygon (lat,lon pairs one per line)</span><textarea id="sectorPolygonInput" rows="4" placeholder="32.754210,-116.997430&#10;32.754600,-116.996900&#10;32.753900,-116.996200"></textarea></label>
+          <div class="button-row">
+            <button class="action" id="applySectorPolygonBtn">Apply Polygon To Sector</button>
+          </div>
+          <div id="polygonShadeBox" class="result-card small">No sector polygon applied yet.</div>
+        </div>
+
+        <div class="proof-box doctrine-box">
+          <div class="subhead tight"><h3>Bounded-Use Doctrine</h3></div>
+          <div id="doctrineBox" class="result-card small">Doctrine not loaded yet.</div>
+        </div>
+
+        <div class="proof-box failure-box">
+          <div class="subhead tight"><h3>Failure-Mode Visibility</h3></div>
+          <div id="failureModeBox" class="result-card small">Failure-state scan not run yet.</div>
+          <div id="failureBoard" class="timeline compact"></div>
+        </div>
+
+        <div class="proof-box normalization-box">
+          <div class="subhead tight"><h3>Import Normalization</h3></div>
+          <div class="button-row">
+            <button class="action ghost" id="runNormalizationBtn">Run Normalization Scan</button>
+          </div>
+          <div id="normalizationBox" class="result-card small">No normalization scan yet.</div>
+        </div>
+
+        <div class="proof-box stress-box">
+          <div class="subhead tight"><h3>Stress View</h3></div>
+          <div class="button-row">
+            <button class="action" id="toggleStressViewBtn">Toggle Stress View</button>
+          </div>
+          <div id="stressViewBox" class="result-card small">Stress view off.</div>
+        </div>
+
+
+
+
+
+
+
+
+</div>
+
+        <div class="proof-box ack-source-box">
+          <div class="subhead tight"><h3>Remote ACK Source</h3></div>
+          <div class="grid two">
+            <label><span>ACK Source</span><input id="ackSourceInput" type="text" placeholder="Command Node / Repeater / ALPHA-2" /></label>
+            <label><span>ACK Route</span>
+              <select id="ackRouteSelect">
+                <option value="radio_net">Radio Net</option>
+                <option value="command_gateway">Command Gateway</option>
+                <option value="adapter_only">Adapter Only</option>
+              </select>
+            </label>
+          </div>
+          <div id="ackSourceBox" class="result-card small">No remote ACK source recorded yet.</div>
+        </div>
+
+
+
+
+
+        <div class="button-row">
+          <button class="action" id="logBtn">LOG NOTE</button>
+          <button class="action ghost" id="voiceLogBtn">Voice Log</button>
+        </div>
+
+        <div class="log-box">
+          <div class="subhead tight"><h3>Field Log</h3><div class="inline-pills"><span class="mini-pill" id="logState">manual</span></div></div>
+          <textarea id="logInput" rows="4" placeholder="Type or dictate a field note..."></textarea>
+          <button class="action ghost full" id="appendLogBtn">Append Log Entry</button>
+          <div id="logEntries" class="log-entries"></div>
+        </div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Packet Bundle</h3></div>
+          <div class="button-row stacked">
+            <button class="action ghost full" id="exportTeamPacketBtn">Export Packet Bundle</button>
+            <label class="file-label"><input type="file" id="importTeamPacketInput" accept=".json,application/json" hidden /><span class="action ghost full">Import Packet Bundle</span></label>
+          </div>
+          <div id="teamPacketBox" class="result-card small">No imported bundle loaded.</div>
+        </div>
+
+        <div class="proof-box">
+          <div class="subhead tight"><h3>Proof Metrics</h3></div>
+          <div class="proof-metrics">
+            <div class="proof-metric"><span>Scans</span><strong id="metricScans">0</strong></div>
+            <div class="proof-metric"><span>Captures</span><strong id="metricCaptures">0</strong></div>
+            <div class="proof-metric"><span>Logs</span><strong id="metricLogs">0</strong></div>
+            <div class="proof-metric"><span>Commits</span><strong id="metricCommits">0</strong></div>
+            <div class="proof-metric"><span>GPS Points</span><strong id="metricGps">0</strong></div>
+            <div class="proof-metric"><span>Markers</span><strong id="metricMarkers">0</strong></div>
+            <div class="proof-metric"><span>Peers</span><strong id="metricPeers">0</strong></div>
+            <div class="proof-metric"><span>Queued</span><strong id="metricQueued">0</strong></div>
+            <div class="proof-metric"><span>ACKed</span><strong id="metricAcked">0</strong></div>
+            <div class="proof-metric"><span>Failed</span><strong id="metricFailed">0</strong></div>
+          </div>
+          <div class="button-row stacked">
+            <button class="action ghost full" id="exportJsonBtn">Export JSON</button>
+            <button class="action ghost full" id="exportReportBtn">Export Report</button>
+            <button class="action ghost full" id="printBtn">Print Summary</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <template id="logTemplate">
+    <div class="log-entry">
+      <div class="log-entry-head">
+        <strong class="log-time"></strong>
+        <span class="log-tag"></span>
+      </div>
+      <div class="log-body"></div>
+    </div>
+  </template>
+
+
+  <div id="demoOverlay" class="demo-overlay hidden">
+    <div class="demo-panel">
+      <div class="demo-kicker">DEMO MODE</div>
+      <h2 id="demoTitle">Scenario</h2>
+      <div id="demoBody" class="demo-body">Press START DEMO.</div>
+      <div class="demo-meta">
+        <span id="demoStepReadout">Step 0 / 0</span>
+        <span id="demoModeReadout">Guided walkthrough</span>
+      </div>
+      <div id="demoExplainBox" class="demo-explain">The system will walk you through what changed and why it matters.</div>
+      <div class="demo-actions-row">
+        <button class="action" id="demoPrevBtn">PREV</button>
+        <button class="action" id="demoNextInlineBtn">NEXT</button>
+      </div>
+      <div class="demo-scenario-row">
+        <label>
+          <span>Scenario</span>
+          <select id="demoScenarioSelect">
+            <option value="lost_hiker">Lost Hiker</option>
+            <option value="injured_climber">Injured Climber</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
