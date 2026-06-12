@@ -211,6 +211,52 @@
 </div>
 <div class="grid-bg"></div>
 
+<!-- Continuity Instrument: stationary ambient glyph filling the lower-right negative space -->
+<style>
+  #continuity-amb{position:fixed;right:4vw;top:12vh;z-index:0;pointer-events:none;
+    width:min(52vh,50vw);opacity:.85;
+    --ci-line:rgba(217,255,235,.6);--ci-soft:rgba(217,255,235,.22);
+    --ci-accent:#9ef4c1;--ci-warn:#ffd48a}
+  #continuity-amb svg{display:block;width:100%;height:auto;overflow:visible}
+  #continuity-amb svg *{vector-effect:non-scaling-stroke}
+  #continuity-amb #ci-spikes text{font-family:var(--mono);font-weight:600}
+  #continuity-amb .ci-ring{fill:none;stroke:var(--ci-line);stroke-width:1.6;transform-origin:160px 160px;
+    animation:ciBreathe 6s ease-in-out infinite;transition:stroke .8s ease}
+  #continuity-amb .ci-ring.r2{animation-delay:.3s}
+  #continuity-amb .ci-ring.r3{animation-delay:.6s;stroke:var(--ci-soft)}
+  #continuity-amb.elevated .ci-ring{stroke:var(--ci-warn);animation-duration:2.4s}
+  #continuity-amb .ci-core{fill:var(--ci-accent);filter:drop-shadow(0 0 12px rgba(158,244,193,.7))}
+  #continuity-amb .ci-tick{stroke:var(--ci-soft);stroke-width:2;opacity:.3}
+  @keyframes ciBreathe{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.03);opacity:1}}
+  #continuity-amb .ci-words{display:flex;align-items:center;justify-content:center;margin-top:13px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase}
+  #continuity-amb .ci-words .w{color:rgba(171,196,186,.32);transition:color .45s ease,text-shadow .45s ease}
+  #continuity-amb .ci-words .w.on{color:var(--ci-accent);text-shadow:0 0 12px rgba(158,244,193,.5)}
+  #continuity-amb .ci-words .w.on.hot{color:var(--ci-warn);text-shadow:0 0 12px rgba(255,212,138,.5)}
+  #continuity-amb .ci-words .sep{width:16px;height:1px;background:rgba(171,196,186,.16);margin:0 9px}
+  @media(max-width:760px){
+    #continuity-amb{right:4vw;top:14vh;width:min(40vh,64vw);opacity:.6}
+    #continuity-amb .ci-words{font-size:8px;letter-spacing:.14em}
+    #continuity-amb .ci-words .sep{width:8px;margin:0 5px}}
+  @media(prefers-reduced-motion:reduce){#continuity-amb .ci-ring{animation:none}}
+</style>
+<div id="continuity-amb" aria-hidden="true">
+  <svg viewBox="0 0 320 320">
+    <circle class="ci-ring r3" cx="160" cy="160" r="112"/>
+    <circle class="ci-ring r2" cx="160" cy="160" r="76"/>
+    <circle class="ci-ring r1" cx="160" cy="160" r="38"/>
+    <g id="ci-ticks"></g>
+    <g id="ci-spikes"></g>
+    <circle class="ci-core" cx="160" cy="160" r="14"/>
+  </svg>
+  <div class="ci-words">
+    <span class="w" data-phase="baseline">Baseline</span><span class="sep"></span>
+    <span class="w" data-phase="deviation">Deviation</span><span class="sep"></span>
+    <span class="w" data-phase="severity">Severity</span><span class="sep"></span>
+    <span class="w" data-phase="claim">Claim</span>
+  </div>
+</div>
+
 <header class="hdr">
   <div class="hbar">
     <div class="logo"><span class="glyph"></span>COLMAC<span style="color:var(--dim)">PULSE</span></div>
@@ -753,6 +799,102 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     if(e.target.closest('.spot-ret')||e.target.classList.contains('spot-back')) close();
   });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape'&&sp.classList.contains('open')) close(); });
+})();
+</script>
+<script>
+/* Continuity Instrument engine: the doctrine running in place. Deviations rise from the
+   perimeter, severity climbs, a claim is locked, then it decays back to the expected state.
+   Stationary, non-interactive, reduced-motion safe. Geometry and colors are Col's. */
+(function(){
+  var root=document.getElementById('continuity-amb'); if(!root) return;
+  var spikes=root.querySelector('#ci-spikes'), ticks=root.querySelector('#ci-ticks');
+  var words=[].slice.call(root.querySelectorAll('.ci-words .w'));
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS='http://www.w3.org/2000/svg';
+  var ACCENT=[158,244,193], WARN=[255,212,138], HOT=[255,150,95];
+  function rgb(c){return 'rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')';}
+  function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+  function sevColor(s){return s<0.6?mix(ACCENT,WARN,s/0.6):mix(WARN,HOT,(s-0.6)/0.4);}
+  var ease=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+  var CX=160, CY=160, R_OUT=112;
+
+  for(var i=0;i<24;i++){
+    var a=i/24*Math.PI*2, r1=R_OUT+4, r2=R_OUT+10;
+    var ln=document.createElementNS(NS,'line'); ln.setAttribute('class','ci-tick');
+    ln.setAttribute('x1',CX+Math.cos(a)*r1); ln.setAttribute('y1',CY+Math.sin(a)*r1);
+    ln.setAttribute('x2',CX+Math.cos(a)*r2); ln.setAttribute('y2',CY+Math.sin(a)*r2);
+    ticks.appendChild(ln);
+  }
+
+  var events=[], last=0, spawnAcc=0, curPhase='', PACE=14;
+
+  function setPhase(p,sev){
+    var hot=sev>0.55;
+    if(p!==curPhase){ curPhase=p; words.forEach(function(w){w.classList.toggle('on',w.dataset.phase===p);}); }
+    words.forEach(function(w){ w.classList.toggle('hot', w.classList.contains('on')&&hot); });
+  }
+
+  function spawn(){
+    if(events.length>=3) return;
+    var a=Math.random()*Math.PI*2;
+    var ln=document.createElementNS(NS,'line'); ln.setAttribute('stroke-width','3'); ln.setAttribute('stroke-linecap','round');
+    var lock=document.createElementNS(NS,'path'); lock.setAttribute('fill','none'); lock.setAttribute('stroke-width','2');
+    var txt=document.createElementNS(NS,'text'); txt.setAttribute('font-size','11');
+    spikes.appendChild(ln); spikes.appendChild(lock); spikes.appendChild(txt);
+    events.push({a:a,phase:'rise',t:0,sev:0,peak:0.45+Math.random()*0.5,
+      rise:2.1+Math.random()*1.2,hold:0.7,decay:2.4+Math.random()*1.0,ln:ln,lock:lock,txt:txt});
+  }
+
+  function drawSpike(e){
+    var col=rgb(sevColor(e.sev));
+    var len=6+e.sev*78, r1=R_OUT+2, r2=R_OUT+2+len, ca=Math.cos(e.a), sa=Math.sin(e.a);
+    var x1=CX+ca*r1,y1=CY+sa*r1,x2=CX+ca*r2,y2=CY+sa*r2;
+    e.ln.setAttribute('x1',x1); e.ln.setAttribute('y1',y1); e.ln.setAttribute('x2',x2); e.ln.setAttribute('y2',y2);
+    e.ln.setAttribute('stroke',col);
+    e.ln.setAttribute('opacity', e.phase==='decay'? Math.max(0,e.sev/Math.max(e.peak,.001)) : Math.min(1,.4+e.sev));
+    if(e.phase==='claim'){
+      var s=9, px=x2, py=y2;
+      e.lock.setAttribute('d',
+        'M '+(px-s)+' '+(py-s)+' L '+(px-s)+' '+(py-s+5)+' M '+(px-s)+' '+(py-s)+' L '+(px-s+5)+' '+(py-s)+
+        ' M '+(px+s)+' '+(py+s)+' L '+(px+s)+' '+(py+s-5)+' M '+(px+s)+' '+(py+s)+' L '+(px+s-5)+' '+(py+s));
+      e.lock.setAttribute('stroke',col); e.lock.setAttribute('opacity','1');
+    } else e.lock.setAttribute('opacity','0');
+    if(e.sev>0.05){
+      var tr=r2+12;
+      e.txt.setAttribute('x',CX+ca*tr); e.txt.setAttribute('y',CY+sa*tr+3);
+      e.txt.setAttribute('text-anchor', ca<-0.3?'end':(ca>0.3?'start':'middle'));
+      e.txt.setAttribute('fill',col);
+      e.txt.setAttribute('opacity', e.phase==='decay'?e.sev/Math.max(e.peak,.001):.7);
+      e.txt.textContent = e.phase==='claim'?'CLAIM':e.sev.toFixed(2);
+    } else e.txt.setAttribute('opacity','0');
+  }
+
+  function update(dt){
+    spawnAcc+=dt;
+    var interval=Math.max(0.9, 3.6-PACE*0.11);
+    if(spawnAcc>=interval){ spawnAcc=0; spawn(); }
+    var domSev=0, domPhase='baseline';
+    for(var i=events.length-1;i>=0;i--){
+      var e=events[i]; e.t+=dt;
+      if(e.phase==='rise'){
+        var k=Math.min(1,e.t/e.rise); e.sev=ease(k)*e.peak;
+        if(k>=1){ e.phase='claim'; e.t=0; }
+      } else if(e.phase==='claim'){
+        if(e.t>=e.hold){ e.phase='decay'; e.t=0; }
+      } else {
+        var k2=Math.min(1,e.t/e.decay); e.sev=e.peak*(1-ease(k2));
+        if(k2>=1){ e.ln.remove(); e.lock.remove(); e.txt.remove(); events.splice(i,1); continue; }
+      }
+      drawSpike(e);
+      if(e.sev>domSev){ domSev=e.sev; domPhase = e.phase==='claim'?'claim':(e.sev>0.55?'severity':'deviation'); }
+    }
+    root.classList.toggle('elevated', domSev>0.55);
+    setPhase(domSev<0.02?'baseline':domPhase, domSev);
+  }
+
+  function loop(now){ var dt=Math.min(0.05,(now-last)/1000||0); last=now; update(dt); requestAnimationFrame(loop); }
+  setPhase('baseline',0);
+  if(!reduce){ last=performance.now(); requestAnimationFrame(loop); }
 })();
 </script>
 </body>
