@@ -310,7 +310,7 @@
       <h2>The Tools</h2>
       <span class="kicker">Download · own · run offline</span>
     </div>
-    <p class="lead-copy">Each tool is a single HTML file that runs in your browser. Buy it once, keep it forever. File engines for people drowning in files, field scopes for the trades, the writers' bench for film and TV, and VIRIDENCE for the grow.</p>
+    <p class="lead-copy">Each tool is a single HTML file that runs in your browser. Buy it once, keep it forever. File engines for people drowning in files, and the writers' bench for film and TV.</p>
 
     <div class="pack">
       <div>
@@ -327,14 +327,14 @@
     <div class="subhead">The Engines · File tools</div>
     <div class="cards" id="engine-grid"></div>
 
-    <div class="subhead">Field Scopes · Diagnosis tools for the trades</div>
+    <div class="subhead" id="scope-head">Field Scopes · Diagnosis tools for the trades</div>
     <div class="cards" id="scope-grid"></div>
 
-    <div class="subhead">VIRIDENCE · Read the grow as behavior over time</div>
+    <div class="subhead" id="viridence-head">VIRIDENCE · Read the grow as behavior over time</div>
     <div class="cards" id="viridence-grid"></div>
 
     <div class="subhead">The Writers' Bench · Tools for the script</div>
-    <p class="lead-copy" style="margin:2px 0 16px">The studio-side line: five single-file tools for writing and developing a film or show: story, characters, capture, transcript cleanup, and screenplay revision. Same deal as the rest. Buy once, run offline, keep forever.</p>
+    <p class="lead-copy" style="margin:2px 0 16px">The studio-side line: single-file tools for writing and developing a film or show. Same deal as the rest. Buy once, run offline, keep forever.</p>
 
     <div class="pack">
       <div>
@@ -526,7 +526,7 @@ const FILM = [
    render:"renders/script-surgeon.jpg",
    long:"Script Surgeon is revision control built for screenplays: track every draft as a named, color-coded version, compare any two side by side with added, removed, and modified lines, follow changes by scene, and keep a full draft history with revision notes. Precision version control for writers who can't afford to lose a change.",
    solves:"Screenplays go through dozens of drafts and changes get lost between them. Script Surgeon tracks every revision, shows exactly what changed between any two, and keeps the trail so nothing disappears in the rewrite."},
-  {name:"AUTHORPRINT", a:"#e8c14a", price:"$49", sub:"Rewrite a draft into your own authentic voice, with a voice-match score and meaning preserved.", demo:"authorprint-demo.html", buy:"",
+  {name:"AUTHORPRINT", a:"#e8c14a", price:"$49", sub:"Rewrite a draft into your own authentic voice, with a voice-match score and meaning preserved.", buy:"",
    render:"renders/authorprint.jpg",
    long:"AUTHORPRINT rewrites text into your authentic voice. Feed it a draft and it transforms the prose to match your voice signature, word choice, sentence rhythm, tone, and imagery, scored against your style profile, with tone and intensity controls and a preserve-meaning lock so it changes the voice, not the substance.",
    solves:"AI drafts and rough text read like nobody. AUTHORPRINT rewrites them into your voice, scored for how closely they match your signature, so the words sound like you actually wrote them."},
@@ -573,10 +573,19 @@ const card = p => `<div class="card" style="--a:${p.a}" data-spot="${slug(p.name
     <div class="cfoot"><span class="price">${priceHTML(p.price)}</span>
       <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
 
-document.getElementById('engine-grid').innerHTML = ENGINES.map(card).join('');
-document.getElementById('scope-grid').innerHTML  = SCOPES.map(card).join('');
-document.getElementById('viridence-grid').innerHTML = VIRIDENCE.map(card).join('');
-document.getElementById('film-grid').innerHTML = FILM.map(card).join('');
+/* LAUNCH SET — visible SKUs. Everything else stays in the arrays (BONEYARD) but is filtered out of render. Add a slug here to surface a held product. */
+const LIVE = new Set(['thought-vault','local-retrieval','repo-alignment','true-diff','truthsource','storyforge','script-surgeon','authorprint']);
+const liveEngines   = ENGINES.filter(p=>LIVE.has(slug(p.name)));
+const liveScopes    = SCOPES.filter(p=>LIVE.has(slug(p.name)));
+const liveViridence = VIRIDENCE.filter(p=>LIVE.has(slug(p.name)));
+const liveFilm      = FILM.filter(p=>LIVE.has(slug(p.name)));
+document.getElementById('engine-grid').innerHTML = liveEngines.map(card).join('');
+document.getElementById('scope-grid').innerHTML  = liveScopes.map(card).join('');
+document.getElementById('viridence-grid').innerHTML = liveViridence.map(card).join('');
+document.getElementById('film-grid').innerHTML = liveFilm.map(card).join('');
+const hideIfEmpty=(headId,gridId,arr)=>{const d=arr.length?'':'none';const h=document.getElementById(headId),g=document.getElementById(gridId);if(h)h.style.display=d;if(g)g.style.display=d;};
+hideIfEmpty('scope-head','scope-grid',liveScopes);
+hideIfEmpty('viridence-head','viridence-grid',liveViridence);
 document.getElementById('film-pack-name').textContent = FILMPACK.name;
 document.getElementById('film-pack-sub').textContent  = FILMPACK.sub;
 document.getElementById('film-pack-price').innerHTML  = priceHTML(FILMPACK.price);
@@ -605,7 +614,7 @@ const packbars=document.getElementById('packbars');
 SPECTRUM.forEach((c,i)=>{const b=document.createElement('i');
   b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=c;b.style.boxShadow="0 0 10px "+c;packbars.appendChild(b);});
 
-const missing=(PACK.buy?0:1)+(FILMPACK.buy?0:1)+ENGINES.filter(e=>!e.buy).length+SCOPES.filter(s=>!s.buy).length+VIRIDENCE.filter(v=>!v.buy).length+FILM.filter(f=>!f.buy).length;
+const missing=(PACK.buy?0:1)+(FILMPACK.buy?0:1)+liveEngines.filter(e=>!e.buy).length+liveScopes.filter(s=>!s.buy).length+liveViridence.filter(v=>!v.buy).length+liveFilm.filter(f=>!f.buy).length;
 const isLocal=location.protocol==='file:'||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 if(missing&&isLocal){const el=document.getElementById('setup');el.style.display='block';
   el.innerHTML=`⚙ Setup: ${missing} checkout link(s) empty. Once your Lemon Squeezy store is activated, paste each product's URL into <code>buy:""</code> in the config block.`;}
