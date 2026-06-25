@@ -344,8 +344,11 @@
     <div class="subhead" id="viridence-head">VIRIDENCE · Read the grow as behavior over time</div>
     <div class="cards" id="viridence-grid"></div>
 
-    <div class="subhead">The Writers' Bench · Tools for the script</div>
-    <p class="lead-copy" style="margin:2px 0 16px">The studio-side line: single-file tools for writing and developing a film or show. Same deal as the rest. Buy once, run offline, keep forever.</p>
+    <div style="text-align:center;margin:40px 0 4px">
+      <img src="sigil-film-gold-web.png" alt="The Writers' Bench" width="132" height="123" style="width:132px;height:auto;opacity:.96;filter:drop-shadow(0 0 22px rgba(202,162,74,.42)) drop-shadow(0 0 6px rgba(202,162,74,.5))" />
+    </div>
+    <div class="subhead" style="text-align:center;border:0;justify-content:center">The Writers' Bench · Tools for the script</div>
+    <p class="lead-copy" style="margin:2px 0 16px;text-align:center">The studio-side line: single-file tools for writing and developing a film or show. Same deal as the rest. Buy once, run offline, keep forever.</p>
 
     <div class="pack">
       <div>
@@ -360,6 +363,17 @@
     </div>
 
     <div class="cards" id="film-grid"></div>
+
+    <div class="pack" style="--a:#e06a98;margin-top:18px">
+      <div>
+        <h3 style="color:#e06a98">MAG PACK · the two MAGs, paired</h3>
+        <p>MAG DUMP sorts a folder by what fits your project, MAG FINDER indexes the pile and confirms duplicates by hash. Organize what belongs, surface what is buried. $69 instead of $98 apart.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span class="pprice" style="color:#e06a98">$69</span>
+        <a class="buy" href="https://colmacpulse.lemonsqueezy.com/checkout/buy/759ec775-890a-40e0-a0bc-50cc0a86ad9a" target="_blank" rel="noopener" style="--a:#e06a98">Get the pack →</a>
+      </div>
+    </div>
   </section>
 
   <section class="sec" id="work">
@@ -545,10 +559,10 @@ const FILM = [
    render:"renders/mag-dump.jpg",
    long:"Dump a raw story idea and Mag Dump scores it for project fit, concept strength, market relevance, audience appeal, commercial potential, uniqueness, and execution feasibility, then matches it against your existing projects and suggests genre, format, and budget range. Know what's worth writing before you spend months writing it.",
    solves:"Writers pour months into ideas that were never going to land. Mag Dump pressure-tests an idea up front, scores its real potential, and tells you which of your projects it actually belongs to."},
-  {name:"MAG FINDER", a:"#e879f9", price:"$49", sub:"Match your story to the right magazines, festivals, and competitions, and track every submission.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d86109d1-7055-4f1d-a17e-b796bbde9746",
+  {name:"MAG FINDER", a:"#e879f9", price:"$49", sub:"Index a messy folder and see what is actually in there, with duplicate files confirmed by content hash. Local only.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d86109d1-7055-4f1d-a17e-b796bbde9746",
    render:"renders/mag-finder.jpg",
-   long:"Mag Finder matches your story or script against a database of magazines, festivals, and competitions, scoring each on genre alignment, audience match, theme relevance, and submission fit. Submission opportunities with deadlines and fees, market insights on what's trending, and a tracker for every submission you make.",
-   solves:"Great writing dies in the wrong inbox. Mag Finder finds the markets actually likely to want your story, ranks them by fit, and keeps your submissions organized so you target smarter and get seen."},
+   long:"MAG FINDER is an offline vault radar. Point it at a folder and it indexes every file, then surfaces total size, top hits, timeline clusters, and project groupings, and confirms likely duplicates by content hash so you can clear the pile. Search and filter by name, path, extension, or project, sort it any way you need, and export a CSV or a plain-text receipt. Nothing leaves your machine.",
+   solves:"Years of drafts, exports, and renamed versions pile up until you cannot tell what is real and what is just a copy. MAG FINDER indexes the whole folder, clusters it by project and time, and confirms duplicates by hash, so you can see your vault and clear the noise, all offline."},
 ];
 
 const PROJECTS = [
