@@ -417,41 +417,41 @@
 
 <script>
 /* ===== paste each product's Lemon Squeezy checkout link into "buy" once your store is activated ===== */
-const PACK = { name:"Operator Pack", sub:"All nine file engines, one purchase. $199 instead of $391 apart.", price:"$199", buy:"" };
+const PACK = { name:"Operator Pack", sub:"All nine file engines, one purchase. $199 instead of $391 apart.", price:"$199", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/891ffcac-00e8-4c58-a634-4a997666f04b" };
 const ENGINES = [
-  {name:"THOUGHT VAULT",      sub:"Turn AI chat exports and loose files into a library you can navigate.", price:"$49",    a:"#22d3ee", buy:"",
+  {name:"THOUGHT VAULT",      sub:"Turn AI chat exports and loose files into a library you can navigate.", price:"$49",    a:"#22d3ee", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/761ca62f-537b-492f-9542-3832e327c64a",
    render:"renders/thought-vault.jpg",
    long:"Drop in voice memos, screenshots, notes, idea fragments, meeting notes, whatever you've got. Thought Vault ingests anything, normalizes and tags it automatically, and indexes it so you can pull a half-remembered idea back out with plain search. Capture is messy on purpose; retrieval is clean.",
    solves:"Your ideas and chat exports pile up in folders you never open again. Thought Vault makes capture frictionless and retrieval instant, so nothing you saved is ever actually lost."},
-  {name:"BATCH PREP",         sub:"Package a batch into a real ZIP with a proof manifest of what's inside.", price:"$49", a:"#ffb454", buy:"",
+  {name:"BATCH PREP",         sub:"Package a batch into a real ZIP with a proof manifest of what's inside.", price:"$49", a:"#ffb454", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/6e7c199e-3c87-4509-b989-46531242a500",
    render:"renders/batch-prep.jpg",
    long:"Feed it hundreds of mixed files and it runs the whole pipeline: ingest, extract, clean, structure, tag, validate, output. You get clean text, structured data, organized folders, and a quality report, plus a real ZIP with a proof manifest of exactly what's inside.",
    solves:"Prepping a big batch by hand is slow and never consistent. Batch Prep gives you the same clean, documented result every time, in minutes instead of hours."},
-  {name:"DROPZONE ACTION",    sub:"Diagnose a messy batch, get the best next move, prep images in one pass.", price:"$49",   a:"#fb923c", buy:"",
+  {name:"DROPZONE ACTION",    sub:"Diagnose a messy batch, get the best next move, prep images in one pass.", price:"$49",   a:"#fb923c", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/c3c18336-6cc7-481a-aafd-a79dfca85c8d",
    render:"renders/dropzone-action.jpg",
    long:"Drop any file in and Dropzone takes action: it classifies, extracts, cleans, tags, and routes each item to the right place, whether that's Thought Vault, Batch Prep, a Field Scope, or your Downloads, then flags anything that needs your eyes.",
    solves:"You know a file matters but not where it should go. Dropzone decides and routes it for you, so nothing sits in limbo and nothing gets lost."},
-  {name:"DOWNLOADS ENGINE",   sub:"Turn a chaotic downloads folder into clean, named, sorted files.", price:"$49",          a:"#4d9bff", buy:"",
+  {name:"DOWNLOADS ENGINE",   sub:"Turn a chaotic downloads folder into clean, named, sorted files.", price:"$49",          a:"#4d9bff", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/98e81bca-8114-4701-86f0-f3012c8ba26a",
    render:"renders/downloads-engine.jpg",
    long:"Capture web pages, direct links, documents, images, video, audio, archives, and repos. Downloads Engine verifies integrity, strips the junk, tags, and files everything into clean folders, with a health readout showing what's verified, what was deduped, and how much space you saved.",
    solves:"Your downloads folder is where files go to die. Downloads Engine turns it into a clean, verified, searchable library you actually keep."},
-  {name:"LOCAL RETRIEVAL",    sub:"Find the file you half-remember, ranked with the reasons attached.", price:"$29",      a:"#a78bfa", buy:"",
+  {name:"LOCAL RETRIEVAL",    sub:"Find the file you half-remember, ranked with the reasons attached.", price:"$29",      a:"#a78bfa", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/14a36a7c-a12a-40e0-9490-1c65d998dc0a",
    render:"renders/local-retrieval.jpg",
    long:"Index everything local, documents, images, spreadsheets, emails, web pages, code, notes, and search it all in a fraction of a second. Results come back ranked by match with the reasons attached, fully offline, nothing leaving your machine.",
    solves:"Cloud search means handing over your files. Local Retrieval finds the thing you half-remember instantly and privately, with the match reasons shown so you trust the result."},
-  {name:"REPO ALIGNMENT",     sub:"See which repos overlap, cluster, and merge. Local-first.", price:"$49",                a:"#06d6c4", buy:"",
+  {name:"REPO ALIGNMENT",     sub:"See which repos overlap, cluster, and merge. Local-first.", price:"$49",                a:"#06d6c4", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/565a683b-bb84-47c5-8b0b-e8e2aa4e92a9",
    render:"renders/repo-alignment.jpg",
    long:"Point it at local folders, Git repos, ZIP archives, external drives, and network shares. Repo Alignment discovers and fingerprints every file, compares versions, normalizes names, and aligns it all into a single source of truth, with a change map and an alignment score showing exactly what overlapped, what was newer, and what conflicted.",
    solves:"The same project lives in five places with no clear winner. Repo Alignment finds every copy, resolves the conflicts, and gives you one unified, trustworthy structure, all local."},
-  {name:"TEXT NORMALIZATION", sub:"Clean up messy text without rewriting a single word.", price:"$19", demo:"textnorm-demo.html",                   a:"#5ee672", buy:"",
+  {name:"TEXT NORMALIZATION", sub:"Clean up messy text without rewriting a single word.", price:"$19", demo:"textnorm-demo.html",                   a:"#5ee672", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d1835126-12bf-4b19-b07e-40c8234137ca",
    render:"renders/text-normalization.jpg",
    long:"Feed it documents, spreadsheets, code, logs, emails, web content, mixed-format notes. Text Normalization detects the format, cleans the noise, and applies consistent rules for case, spacing, dates, units, and structure, then exports clean text to TXT, Markdown, JSON, CSV, or Word. It fixes the formatting without ever rewriting your words.",
    solves:"Messy, inconsistent text is unusable downstream, but you don't want an AI changing your meaning. Text Normalization standardizes the formatting and leaves every word exactly as you wrote it."},
-  {name:"TRUE DIFF", sub:"Compare two versions, approve changes line by line, and keep the trail.", price:"$49", a:"#a3e635", buy:"",
+  {name:"TRUE DIFF", sub:"Compare two versions, approve changes line by line, and keep the trail.", price:"$49", a:"#a3e635", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/baeb132c-dbcf-4387-b874-6bbf255e06e3",
    render:"renders/true-diff.jpg",
    long:"Pick two versions and True Diff shows exactly what changed: added, removed, modified, moved, with formatting changes broken out separately so they don't drown the real edits. Side-by-side, unified, or split view, with change context and an exportable diff report you can keep as a trail.",
    solves:"Most diff tools bury the meaningful change under whitespace and formatting noise. True Diff cuts to what actually changed between two versions, so you can review and approve with confidence."},
-  {name:"TRUTHSOURCE", sub:"Seal a set of files so anyone can verify nothing was altered after the fact.", price:"$49", a:"#f59e0b", buy:"",
+  {name:"TRUTHSOURCE", sub:"Seal a set of files so anyone can verify nothing was altered after the fact.", price:"$49", a:"#f59e0b", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/32c95c47-21b3-4ea9-8e43-bc86981227cc",
    render:"renders/truthsource.jpg",
    long:"Bring in primary sources and TruthSource ingests, fingerprints with SHA-256, verifies integrity, links related evidence, and publishes each as a trusted source with a chain of custody. Every source gets a trust score across origin, integrity, provenance, and cross-confirmation, so you know what's solid and what's flagged.",
    solves:"Once files leave your hands you can't prove they weren't altered. TruthSource seals and timestamps a verifiable chain of custody, so anyone can confirm nothing changed after the fact."},
@@ -515,37 +515,37 @@ const VIRIDENCE = [
    solves:"You cannot tell from one photo whether a plant is fine, stressed, or recovering. VIRIDENCE turns a sequence of shots into a readable trend, so you catch drift early and know where to look, without pretending to diagnose from a single frame.",
    caps:["Six-signal behavior read: HOLD, PUSH, REACH, TENSION, BREAK, RECOVER","Gold-run baseline plus a frame-by-frame deviation ribbon","Match percentage and a 0 to 5 deviation severity","JSON export, fully offline, single file"]},
 ];
-const FILMPACK = { name:"The Writers' Bench", sub:"All eight writing tools, one purchase. $229 instead of $442 separately.", price:"$229", buy:"" };
+const FILMPACK = { name:"The Writers' Bench", sub:"All eight writing tools, one purchase. $229 instead of $442 separately.", price:"$229", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/a46d7bff-e0ff-41de-a9fa-acfd0e272133" };
 const FILM = [
-  {name:"StoryForge", a:"#e0a33a", price:"$69", sub:"Treatment-first story engine. Turn a premise into treatments, season structures, and episode maps.", buy:"",
+  {name:"StoryForge", a:"#e0a33a", price:"$69", sub:"Treatment-first story engine. Turn a premise into treatments, season structures, and episode maps.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/2757e8c9-0316-4871-b5bb-493754b4df20",
    render:"renders/storyforge.jpg",
    long:"StoryForge is built for TV: turn a premise and world into treatments, season structures, episode maps, and story arcs, all held in a series bible with characters, locations, and themes. Plan the show at the level buyers actually read, season by season and episode by episode.",
    solves:"Selling a show means showing the framework, not just the idea. StoryForge builds the treatments, season structure, and episode maps that make a series legible to a room, with everything in one bible."},
-  {name:"Character Capsule Builder", a:"#d99a3a", price:"$49", sub:"Build a portable character that scores its own completeness and flags identity drift.", buy:"",
+  {name:"Character Capsule Builder", a:"#d99a3a", price:"$49", sub:"Build a portable character that scores its own completeness and flags identity drift.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/1ba070c3-b049-4edc-93b0-f599655cfb5c",
    render:"renders/character-capsule.jpg",
    long:"Character Capsule Builder turns a character into a portable, scored capsule: role, archetype, motivations, strengths, flaws, core conflict, relationships, and arc, with a depth score that tells you how developed they really are. A relationship map and development tracker show who connects to whom and what still needs work.",
    solves:"Flat characters and forgotten details sink a story. Character Capsule Builder scores each character's depth, flags what's underdeveloped, and keeps every layer in one capsule you can carry between projects."},
-  {name:"Writer's Room", a:"#d98a4a", price:"$49", sub:"A shared room for projects, an idea board, and the team to break stories together.", buy:"",
+  {name:"Writer's Room", a:"#d98a4a", price:"$49", sub:"A shared room for projects, an idea board, and the team to break stories together.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/c93b08bd-435f-4663-8dbe-4de7d6660018",
    render:"renders/writers-room.jpg",
    long:"Writer's Room is the collaborative space: multiple projects, an idea board that moves cards from ideas to discussing to developing to locked, shared documents, session tracking, and room chat. Break stories together and keep every decision in one place.",
    solves:"Group story development scatters across chats, docs, and memory. Writer's Room gives the team one board, one doc shelf, and one record of what got decided, so the story gets built together instead of in pieces."},
-  {name:"SignalScript", a:"#caa24a", price:"$29", sub:"Turn raw speech into clean, structured writing. Dictation, interviews, and transcripts, voice intact.", buy:"",
+  {name:"SignalScript", a:"#caa24a", price:"$29", sub:"Turn raw speech into clean, structured writing. Dictation, interviews, and transcripts, voice intact.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d38ffe8a-fd78-4cd4-90e3-9f31e3606024",
    render:"renders/signalscript.jpg",
    long:"SignalScript cleans and structures spoken input: import audio or transcripts and it strips filler words, fixes punctuation and casing, labels speakers, breaks it into readable paragraphs, and timestamps it, then exports clean text, a formatted script, or notes. Dictation, interviews, and voice memos become usable writing.",
    solves:"Dictation and interview transcripts come out as an unreadable wall. SignalScript turns spoken input into clean, structured text you can actually work with, while keeping the voice that made it worth saying."},
-  {name:"Script Surgeon", a:"#d4674a", price:"$99", sub:"Screenplay revision control. Compare drafts, track changes by version, and keep the full trail.", buy:"",
+  {name:"Script Surgeon", a:"#d4674a", price:"$99", sub:"Screenplay revision control. Compare drafts, track changes by version, and keep the full trail.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d1f1a011-b787-4973-887d-aeeea876bd14",
    render:"renders/script-surgeon.jpg",
    long:"Script Surgeon is revision control built for screenplays: track every draft as a named, color-coded version, compare any two side by side with added, removed, and modified lines, follow changes by scene, and keep a full draft history with revision notes. Precision version control for writers who can't afford to lose a change.",
    solves:"Screenplays go through dozens of drafts and changes get lost between them. Script Surgeon tracks every revision, shows exactly what changed between any two, and keeps the trail so nothing disappears in the rewrite."},
-  {name:"AUTHORPRINT", a:"#e8c14a", price:"$49", sub:"Rewrite a draft into your own authentic voice, with a voice-match score and meaning preserved.", buy:"",
+  {name:"AUTHORPRINT", a:"#e8c14a", price:"$49", sub:"Rewrite a draft into your own authentic voice, with a voice-match score and meaning preserved.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/9e857c7c-eeda-40ac-ae8b-44df671d6132",
    render:"renders/authorprint.jpg",
    long:"AUTHORPRINT rewrites text into your authentic voice. Feed it a draft and it transforms the prose to match your voice signature, word choice, sentence rhythm, tone, and imagery, scored against your style profile, with tone and intensity controls and a preserve-meaning lock so it changes the voice, not the substance.",
    solves:"AI drafts and rough text read like nobody. AUTHORPRINT rewrites them into your voice, scored for how closely they match your signature, so the words sound like you actually wrote them."},
-  {name:"MAG DUMP", a:"#e05a78", price:"$49", sub:"Dump a story idea and get a project-fit score before you write it: concept, market, audience, and fit.", buy:"",
+  {name:"MAG DUMP", a:"#e05a78", price:"$49", sub:"Dump a story idea and get a project-fit score before you write it: concept, market, audience, and fit.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/7aaf0ad4-837b-418e-8486-d50cd8d6d39c",
    render:"renders/mag-dump.jpg",
    long:"Dump a raw story idea and Mag Dump scores it for project fit, concept strength, market relevance, audience appeal, commercial potential, uniqueness, and execution feasibility, then matches it against your existing projects and suggests genre, format, and budget range. Know what's worth writing before you spend months writing it.",
    solves:"Writers pour months into ideas that were never going to land. Mag Dump pressure-tests an idea up front, scores its real potential, and tells you which of your projects it actually belongs to."},
-  {name:"MAG FINDER", a:"#e879f9", price:"$49", sub:"Match your story to the right magazines, festivals, and competitions, and track every submission.", buy:"",
+  {name:"MAG FINDER", a:"#e879f9", price:"$49", sub:"Match your story to the right magazines, festivals, and competitions, and track every submission.", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/d86109d1-7055-4f1d-a17e-b796bbde9746",
    render:"renders/mag-finder.jpg",
    long:"Mag Finder matches your story or script against a database of magazines, festivals, and competitions, scoring each on genre alignment, audience match, theme relevance, and submission fit. Submission opportunities with deadlines and fees, market insights on what's trending, and a tracker for every submission you make.",
    solves:"Great writing dies in the wrong inbox. Mag Finder finds the markets actually likely to want your story, ranks them by fit, and keeps your submissions organized so you target smarter and get seen."},
@@ -584,8 +584,8 @@ const card = p => `<div class="card" style="--a:${p.a}" data-spot="${slug(p.name
     <div class="cfoot"><span class="price">${priceHTML(p.price)}</span>
       <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
 
-/* LAUNCH SET — visible SKUs. Everything else stays in the arrays (BONEYARD) but is filtered out of render. Add a slug here to surface a held product. */
-const LIVE = new Set(['thought-vault','local-retrieval','repo-alignment','true-diff','truthsource','storyforge','script-surgeon','authorprint']);
+/* LAUNCH SET — visible SKUs. Held products stay in the arrays but are filtered out of render. Add a slug here to surface a held product. */
+const LIVE = new Set(['thought-vault','batch-prep','dropzone-action','downloads-engine','local-retrieval','repo-alignment','text-normalization','true-diff','truthsource','storyforge','character-capsule-builder','writer-s-room','signalscript','script-surgeon','authorprint','mag-dump','mag-finder']);
 const liveEngines   = ENGINES.filter(p=>LIVE.has(slug(p.name)));
 const liveScopes    = SCOPES.filter(p=>LIVE.has(slug(p.name)));
 const liveViridence = VIRIDENCE.filter(p=>LIVE.has(slug(p.name)));
