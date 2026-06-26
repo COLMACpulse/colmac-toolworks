@@ -331,7 +331,6 @@
       </div>
       <div style="display:flex;align-items:center;gap:16px">
         <span class="pprice" id="pack-price"></span>
-        <button type="button" class="buy" data-tour="operator" style="--a:#9fe8d4;background:none;cursor:pointer">See what it does →</button>
         <a class="buy" id="pack-buy" style="--a:#9fe8d4">Get the pack →</a>
       </div>
     </div>
@@ -359,7 +358,6 @@
       </div>
       <div style="display:flex;align-items:center;gap:16px">
         <span class="pprice" id="film-pack-price"></span>
-        <button type="button" class="buy" data-tour="bench" style="--a:#caa24a;background:none;cursor:pointer">See what it does →</button>
         <a class="buy" id="film-pack-buy" style="--a:#caa24a">Get the bench →</a>
       </div>
     </div>
@@ -755,6 +753,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   .rp-img{width:100%;border-radius:12px;display:block;margin-top:16px}
   .rp.rp-imgmode{padding:0;border:0;background:none}
   .rp-imgmode .rp-img{margin-top:0;border:1px solid var(--line);border-radius:14px}
+  .rp-imgmode .rp-honest{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#06090c;background:var(--a);text-align:center;padding:11px 12px;border-radius:11px;margin-bottom:13px;box-shadow:0 2px 14px rgba(0,0,0,.35)}
   .rp-readout{margin-top:24px;border:1px solid var(--line);border-radius:12px;background:#05080b;padding:16px}
   .rp-rolabel{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--a);margin-bottom:12px}
   .rp-bcrow{display:flex;align-items:center;gap:14px;margin-bottom:12px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim)}
@@ -814,7 +813,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   function panel(p){
     var sev=(typeof p.sev==='number')?p.sev:3, bad=sev>=3;
     var head='<div class="crn tl"></div><div class="crn tr"></div><div class="crn bl"></div><div class="crn br"></div><div class="rp-eyebrow">A COLMACPULSE TOOL</div>';
-    if(p.render){ return '<div class="rp rp-imgmode"><img class="rp-img" src="'+p.render+'" alt="'+p.name+'" onerror="window.__spotFail&&window.__spotFail(this)"></div>'; }
+    if(p.render){ return '<div class="rp rp-imgmode"><div class="rp-honest">PRETTY RENDERS. UGLY TOOLS. THEY WORK.</div><img class="rp-img" src="'+p.render+'" alt="'+p.name+'" onerror="window.__spotFail&&window.__spotFail(this)"></div>'; }
     return '<div class="rp">'+head+
       '<div class="rp-mark">'+p.name+'</div>'+
       '<div class="rp-tagrow">'+(p.v?'<span class="rp-badge">'+p.v+'</span>':'')+'<span class="rp-tag">'+(p.tag||p.sub||'')+'</span></div>'+
@@ -951,182 +950,5 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   if(!reduce){ last=performance.now(); requestAnimationFrame(loop); }
 })();
 </script>
-<!-- ===== PACK TOUR ===== -->
-<div id="tourModal" class="tm" aria-hidden="true">
-  <div class="tm-back"></div>
-  <div class="tm-box" style="--a:#9fe8d4">
-    <div class="tm-head">
-      <div class="tm-headl">
-        <span class="tm-kicker" id="tmKicker">Pack tour</span>
-        <span class="tm-title" id="tmTitle">See what it does</span>
-      </div>
-      <div class="tm-actions">
-        <span class="tm-count" id="tmCount"></span>
-        <button type="button" class="tm-close" id="tmClose" aria-label="Close tour">✕</button>
-      </div>
-    </div>
-    <div class="tm-body">
-      <div class="tm-stage" id="tmStage"></div>
-      <div class="tm-side" id="tmSide"></div>
-    </div>
-    <div class="tm-foot">
-      <button type="button" class="tm-nav" id="tmPrev">← Back</button>
-      <div class="tm-dots" id="tmDots"></div>
-      <button type="button" class="tm-nav tm-next" id="tmNext">Next →</button>
-    </div>
-  </div>
-</div>
-<style>
-  .tm{position:fixed;inset:0;z-index:1100;display:none}
-  .tm.open{display:block}
-  .tm-back{position:absolute;inset:0;background:rgba(2,6,10,.8);backdrop-filter:blur(4px)}
-  .tm-box{position:absolute;inset:clamp(8px,3vw,40px);background:#0a0f14;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 90px rgba(0,0,0,.7)}
-  .tm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0d141b,#0a0f14)}
-  .tm-headl{display:flex;flex-direction:column;gap:3px;min-width:0}
-  .tm-kicker{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--a)}
-  .tm-title{font-size:15px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tm-actions{display:flex;align-items:center;gap:16px}
-  .tm-count{font-size:11px;letter-spacing:.14em;color:var(--dim);font-family:var(--mono);white-space:nowrap}
-  .tm-close{background:none;border:1px solid var(--line);color:var(--ink);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:13px;line-height:1}
-  .tm-close:hover{border-color:var(--a)}
-  .tm-body{flex:1;display:grid;grid-template-columns:1.45fr 1fr;min-height:0}
-  .tm-stage{position:relative;background:#06090c;border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0}
-  .tm-stage img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
-  .tm-stage iframe{width:100%;height:100%;border:0;background:#0f1115;display:block}
-  .tm-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--a) 16%,#06090c),#06090c)}
-  .tm-ph b{font-size:clamp(28px,6vw,64px);color:var(--a);font-weight:800;letter-spacing:.04em}
-  .tm-ph span{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
-  .tm-badge{position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:#06090c;background:var(--a);padding:5px 10px;border-radius:6px}
-  .tm-honest{position:absolute;top:0;left:0;right:0;z-index:4;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#06090c;background:var(--a);padding:8px 12px;box-shadow:0 2px 14px rgba(0,0,0,.4)}
-  .tm-side{padding:clamp(20px,2.6vw,34px);overflow:auto;display:flex;flex-direction:column}
-  .tm-side h3{margin:0;font-size:clamp(22px,3vw,32px);color:var(--ink);line-height:1.05}
-  .tm-tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--a);margin-bottom:12px}
-  .tm-one{margin:12px 0 0;color:var(--ink);font-size:15px;line-height:1.5;font-weight:600}
-  .tm-lbl{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin:22px 0 7px}
-  .tm-side p.body{margin:0;color:var(--dim);font-size:13.5px;line-height:1.62}
-  .tm-side ul{margin:6px 0 0;padding-left:0;list-style:none}
-  .tm-side ul li{position:relative;padding-left:18px;margin:8px 0;color:var(--dim);font-size:13px;line-height:1.5}
-  .tm-side ul li:before{content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--a)}
-  .tm-cta{margin-top:auto;padding-top:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .tm-price{font-size:18px;color:var(--ink);font-weight:700}
-  .tm-price s{color:var(--dim);font-weight:400;font-size:13px;margin-left:6px}
-  .tm-live{font:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--a);color:#06090c;border:1px solid var(--a);padding:9px 15px;border-radius:9px;font-weight:700;cursor:pointer}
-  .tm-live.off{background:transparent;color:var(--a)}
-  .tm-get{font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--a);color:var(--a);padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:700}
-  .tm-get:hover,.tm-live:hover{filter:brightness(1.08)}
-  .tm-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-top:1px solid var(--line);background:#0c1218}
-  .tm-nav{font:inherit;font-size:12px;letter-spacing:.06em;background:#111923;border:1px solid var(--line);color:var(--ink);padding:9px 16px;border-radius:9px;cursor:pointer}
-  .tm-nav:hover{border-color:var(--a)}
-  .tm-nav:disabled{opacity:.35;cursor:default}
-  .tm-next{background:var(--a);color:#06090c;border-color:var(--a);font-weight:700}
-  .tm-dots{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;flex:1}
-  .tm-dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:0;padding:0;cursor:pointer}
-  .tm-dot.on{background:var(--a);transform:scale(1.25)}
-  @media (max-width:760px){
-    .tm-body{grid-template-columns:1fr;grid-template-rows:minmax(180px,42%) 1fr}
-    .tm-stage{border-right:0;border-bottom:1px solid var(--line)}
-  }
-</style>
-<script>
-(function(){
-  var P=window.__PRODUCTS; if(!P) return;
-  var DS=window.__DEMO_SRCDOC||{};
-  var TOOLS=window.__TOOL_SRCDOC||{};
-  var m=document.getElementById('tourModal'); if(!m) return;
-  var stage=document.getElementById('tmStage'), side=document.getElementById('tmSide'),
-      dots=document.getElementById('tmDots'), kick=document.getElementById('tmKicker'),
-      titleEl=document.getElementById('tmTitle'), countEl=document.getElementById('tmCount'),
-      prevB=document.getElementById('tmPrev'), nextB=document.getElementById('tmNext'),
-      box=m.querySelector('.tm-box'), blob=null;
-  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  window.__tmShotFail=function(img){ var n=img.getAttribute('data-nm')||''; img.outerHTML='<div class="tm-ph"><b>'+esc((n.trim().charAt(0))||'?')+'</b><span>'+esc(n)+'</span></div>'; };
-  function clearBlob(){ if(blob){ try{URL.revokeObjectURL(blob);}catch(e){} blob=null; } }
-
-  // workflow narrative shown on the closing "together" step
-  var TOGETHER={
-    operator:"Files come in messy. Dropzone Action catches a drop, Batch Prep standardizes names and structure, Downloads Engine and Local Retrieval surface what you actually need, Text Normalization cleans the text without rewriting it, and Repo Alignment, True Diff and TruthSource keep versions honest. Thought Vault holds the notes that tie it together. Nine engines, one folder workflow, every byte staying on your machine.",
-    bench:"StoryForge frames the show, Character Capsule Builder and Writer's Room develop it, SignalScript turns raw talk into clean text, Script Surgeon tracks every draft, and AUTHORPRINT rewrites prose into your own voice. MAG DUMP and MAG FINDER keep the file pile sane underneath it all. Eight tools, one writing room, all single-file and offline."
-  };
-  var INTRO={
-    operator:"Nine single-file engines for people drowning in files. No cloud, no install, no subscription. Step through each one, see what it does, then see how they work as a set.",
-    bench:"Eight single-file tools for writing and developing a film or show. Same deal as the rest: buy once, run offline, keep forever. Here is what each one does, and how the bench works together."
-  };
-
-  var key='operator', i=0, steps=[];
-  function buildSteps(k){
-    var t = k==='operator' ? {kick:'Operator Pack', title:'Nine file engines', bundle:P.PACK, tools:P.ENGINES}
-                           : {kick:"The Writers' Bench", title:'Eight writing tools', bundle:P.FILMPACK, tools:P.FILM};
-    var s=[{type:'intro', kick:t.kick, name:t.bundle.name, body:INTRO[k], bundle:t.bundle, accent:k==='operator'?'#9fe8d4':'#caa24a'}];
-    t.tools.forEach(function(p){
-      var demo = p.demo && DS[p.demo] ? p.demo : null;
-      s.push({type:'tool', name:p.name, accent:p.a, one:p.sub, what:p.long, solves:p.solves, render:p.render, slug:(P.slug?P.slug(p.name):p.name)});
-    });
-    s.push({type:'end', name:'The whole pack', body:TOGETHER[k], bundle:t.bundle, accent:k==='operator'?'#9fe8d4':'#caa24a'});
-    return s;
-  }
-
-  function priceMarkup(b){
-    var save = b.sub && b.sub.match(/instead of\s*\$?([\d,]+)/i);
-    return '<span class="tm-price">'+esc(b.price)+(save?' <s>vs $'+save[1]+'</s>':'')+'</span>';
-  }
-
-  function stageScreenshot(st){
-    if(st.render){
-      return '<img src="'+esc(st.render)+'" alt="'+esc(st.name)+'" onerror="this.parentNode.innerHTML=\'<div class=&quot;tm-ph&quot;><b>'+esc((st.name||'').trim().charAt(0))+'</b><span>'+esc(st.name)+'</span></div>\'">';
-    }
-    return '<div class="tm-ph"><b>'+esc((st.name||'').trim().charAt(0))+'</b><span>'+esc(st.name)+'</span></div>';
-  }
-  function stageOverview(st){
-    return '<div class="tm-ph"><b>'+esc(st.name)+'</b><span>'+(st.type==='end'?'How it works together':'Buy once · run offline · keep forever')+'</span></div>';
-  }
-
-  function render(){
-    var st=steps[i];
-    box.style.setProperty('--a', st.accent||'#9fe8d4');
-    kick.textContent = key==='operator'?'Operator Pack':"The Writers' Bench";
-    titleEl.textContent = st.type==='tool'? st.name : (st.type==='end'?'How it works together':'See what it does');
-    countEl.textContent = (i+1)+' / '+steps.length;
-    clearBlob();
-
-    if(st.type==='tool'){
-      stage.innerHTML=
-        '<div class="tm-honest">PRETTY RENDER. UGLY TOOLS. THEY WORK</div>'+
-        (st.render
-          ? '<img class="tm-shot" src="'+esc(st.render)+'" alt="'+esc(st.name)+'" data-nm="'+esc(st.name)+'" onerror="window.__tmShotFail(this)">'
-          : '<div class="tm-ph"><b>'+esc((st.name||'').trim().charAt(0))+'</b><span>'+esc(st.name)+'</span></div>');
-      side.innerHTML=
-        '<span class="tm-tag">'+esc(key==='operator'?'Engine':'Tool')+' \u00b7 '+(i)+' of '+(steps.length-2)+'</span>'+
-        '<h3>'+esc(st.name)+'</h3>'+
-        '<p class="tm-one">'+esc(st.one)+'</p>'+
-        '<div class="tm-lbl">What it does</div><p class="body">'+esc(st.what)+'</p>'+
-        (st.solves?'<div class="tm-lbl">What it solves</div><p class="body">'+esc(st.solves)+'</p>':'');
-    } else {
-      stage.innerHTML = stageOverview(st);
-      var cta = st.bundle ? '<div class="tm-cta">'+priceMarkup(st.bundle)+
-        (st.bundle.buy?'<a class="tm-get" href="'+esc(st.bundle.buy)+'" target="_blank" rel="noopener">Get the pack →</a>':'')+'</div>' : '';
-      side.innerHTML =
-        '<span class="tm-tag">'+esc(st.type==='end'?'The set':'Overview')+'</span>'+
-        '<h3>'+esc(st.name)+'</h3>'+
-        '<p class="body" style="margin-top:14px;font-size:14px">'+esc(st.body)+'</p>'+ cta;
-    }
-
-    dots.innerHTML = steps.map(function(_,n){return '<button class="tm-dot'+(n===i?' on':'')+'" data-i="'+n+'" aria-label="Step '+(n+1)+'"></button>';}).join('');
-    prevB.disabled = i===0; nextB.textContent = i===steps.length-1 ? 'Done' : 'Next →';
-  }
-
-  function open(k){ key=k; steps=buildSteps(k); i=0; m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; render(); }
-  function close(){ clearBlob(); m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; stage.innerHTML=''; }
-  function go(n){ if(n<0||n>=steps.length){ if(n>=steps.length) return close(); return; } i=n; render(); }
-
-  nextB.addEventListener('click', function(){ go(i+1); });
-  prevB.addEventListener('click', function(){ go(i-1); });
-  document.getElementById('tmClose').addEventListener('click', close);
-  m.querySelector('.tm-back').addEventListener('click', close);
-  dots.addEventListener('click', function(e){ var d=e.target.closest('.tm-dot'); if(d) go(+d.getAttribute('data-i')); });
-  document.addEventListener('keydown', function(e){ if(!m.classList.contains('open'))return; if(e.key==='Escape')close(); if(e.key==='ArrowRight')go(i+1); if(e.key==='ArrowLeft')go(i-1); });
-  document.addEventListener('click', function(e){ var t=e.target.closest('[data-tour]'); if(t){ e.preventDefault(); open(t.getAttribute('data-tour')); } });
-})();
-</script>
-
 </body>
 </html>
