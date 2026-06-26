@@ -997,6 +997,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   .tm-ph b{font-size:clamp(28px,6vw,64px);color:var(--a);font-weight:800;letter-spacing:.04em}
   .tm-ph span{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
   .tm-badge{position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:#06090c;background:var(--a);padding:5px 10px;border-radius:6px}
+  .tm-honest{position:absolute;top:0;left:0;right:0;z-index:4;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#06090c;background:var(--a);padding:8px 12px;box-shadow:0 2px 14px rgba(0,0,0,.4)}
   .tm-side{padding:clamp(20px,2.6vw,34px);overflow:auto;display:flex;flex-direction:column}
   .tm-side h3{margin:0;font-size:clamp(22px,3vw,32px);color:var(--ink);line-height:1.05}
   .tm-tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--a);margin-bottom:12px}
@@ -1030,6 +1031,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
 (function(){
   var P=window.__PRODUCTS; if(!P) return;
   var DS=window.__DEMO_SRCDOC||{};
+  var TOOLS=window.__TOOL_SRCDOC||{};
   var m=document.getElementById('tourModal'); if(!m) return;
   var stage=document.getElementById('tmStage'), side=document.getElementById('tmSide'),
       dots=document.getElementById('tmDots'), kick=document.getElementById('tmKicker'),
@@ -1037,6 +1039,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
       prevB=document.getElementById('tmPrev'), nextB=document.getElementById('tmNext'),
       box=m.querySelector('.tm-box'), blob=null;
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  window.__tmShotFail=function(img){ var n=img.getAttribute('data-nm')||''; img.outerHTML='<div class="tm-ph"><b>'+esc((n.trim().charAt(0))||'?')+'</b><span>'+esc(n)+'</span></div>'; };
   function clearBlob(){ if(blob){ try{URL.revokeObjectURL(blob);}catch(e){} blob=null; } }
 
   // workflow narrative shown on the closing "together" step
@@ -1056,7 +1059,7 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     var s=[{type:'intro', kick:t.kick, name:t.bundle.name, body:INTRO[k], bundle:t.bundle, accent:k==='operator'?'#9fe8d4':'#caa24a'}];
     t.tools.forEach(function(p){
       var demo = p.demo && DS[p.demo] ? p.demo : null;
-      s.push({type:'tool', name:p.name, accent:p.a, one:p.sub, what:p.long, solves:p.solves, render:p.render, demo:demo});
+      s.push({type:'tool', name:p.name, accent:p.a, one:p.sub, what:p.long, solves:p.solves, render:p.render, slug:(P.slug?P.slug(p.name):p.name)});
     });
     s.push({type:'end', name:'The whole pack', body:TOGETHER[k], bundle:t.bundle, accent:k==='operator'?'#9fe8d4':'#caa24a'});
     return s;
@@ -1086,27 +1089,17 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     clearBlob();
 
     if(st.type==='tool'){
-      stage.innerHTML = (st.demo?'<div class="tm-badge">Live demo</div>':'') + stageScreenshot(st);
-      var live = st.demo ? '<button type="button" class="tm-live" id="tmLive">Try it live →</button>' : '';
-      side.innerHTML =
-        '<span class="tm-tag">'+esc(key==='operator'?'Engine':'Tool')+' · '+(i)+' of '+(steps.length-2)+'</span>'+
+      stage.innerHTML=
+        '<div class="tm-honest">PRETTY RENDER. UGLY TOOLS. THEY WORK</div>'+
+        (st.render
+          ? '<img class="tm-shot" src="'+esc(st.render)+'" alt="'+esc(st.name)+'" data-nm="'+esc(st.name)+'" onerror="window.__tmShotFail(this)">'
+          : '<div class="tm-ph"><b>'+esc((st.name||'').trim().charAt(0))+'</b><span>'+esc(st.name)+'</span></div>');
+      side.innerHTML=
+        '<span class="tm-tag">'+esc(key==='operator'?'Engine':'Tool')+' \u00b7 '+(i)+' of '+(steps.length-2)+'</span>'+
         '<h3>'+esc(st.name)+'</h3>'+
         '<p class="tm-one">'+esc(st.one)+'</p>'+
         '<div class="tm-lbl">What it does</div><p class="body">'+esc(st.what)+'</p>'+
-        (st.solves?'<div class="tm-lbl">What it solves</div><p class="body">'+esc(st.solves)+'</p>':'')+
-        '<div class="tm-cta">'+live+'</div>';
-      if(st.demo){
-        document.getElementById('tmLive').addEventListener('click', function(){
-          var on = stage.querySelector('iframe');
-          if(on){ stage.innerHTML='<div class="tm-badge">Live demo</div>'+stageScreenshot(st); this.textContent='Try it live →'; this.classList.remove('off'); }
-          else {
-            var fr=document.createElement('iframe'); fr.setAttribute('title', st.name+' live demo'); fr.srcdoc=DS[st.demo];
-            stage.innerHTML=''; stage.appendChild(fr);
-            var b=document.createElement('div'); b.className='tm-badge'; b.textContent='Live · capped demo'; stage.appendChild(b);
-            this.textContent='Show screenshot'; this.classList.add('off');
-          }
-        });
-      }
+        (st.solves?'<div class="tm-lbl">What it solves</div><p class="body">'+esc(st.solves)+'</p>':'');
     } else {
       stage.innerHTML = stageOverview(st);
       var cta = st.bundle ? '<div class="tm-cta">'+priceMarkup(st.bundle)+
