@@ -471,14 +471,18 @@ const ENGINES = [
    render:"renders/truthsource.jpg",
    long:"Bring in primary sources and TruthSource ingests, fingerprints with SHA-256, verifies integrity, links related evidence, and publishes each as a trusted source with a chain of custody. Every source gets a trust score across origin, integrity, provenance, and cross-confirmation, so you know what's solid and what's flagged.",
    solves:"Once files leave your hands you can't prove they weren't altered. TruthSource seals and timestamps a verifiable chain of custody, so anyone can confirm nothing changed after the fact."},
-  {name:"LAUNCHBAY", sub:"Turn a pile of project files into an armed, deployment-ready package with a real proof hash. Offline, single file.", price:"$49", a:"#34d399", buy:"", pack:false,
+  {name:"LAUNCHBAY", sub:"Turn a pile of project files into an armed, deployment-ready package with a real proof hash. Offline, single file.", price:"$49", a:"#34d399", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/1eb7db8c-ccb3-4aac-a545-6307a82cb0d3", pack:false,
    render:"renders/launchbay.jpg",
    long:"LAUNCHBAY preps a project to ship. Drop your files in and it sorts them by type, scores how close to ready you are, flags sensitive filenames before they go out, and stamps a real SHA-256 continuity hash on the package. Preview the generated static site, arm it, then export a real .zip with a generated index.html, deploy notes, and a manifest. Nothing exports until you arm it, and nothing leaves your machine. It prepares the package; you deploy it.",
    solves:"Shipping a project means gathering files, checking nothing sensitive slips out, and proving the package is intact, all by hand. LAUNCHBAY sorts, scores, flags, hashes, and packages it into one armed .zip you can review and publish anywhere, fully offline."},
-  {name:"SOVEREIGN EVIDENCE ENGINE", sub:"Score every source, tie every claim to it, and compute a confidence you can trace. Offline, single file.", price:"$49", a:"#818cf8", buy:"", pack:false,
+  {name:"SOVEREIGN EVIDENCE ENGINE", sub:"Score every source, tie every claim to it, and compute a confidence you can trace. Offline, single file.", price:"$49", a:"#818cf8", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/0c63fcec-70af-43fd-885d-abf95e319dab", pack:false,
    render:"renders/sovereign-evidence-engine.jpg",
    long:"SOVEREIGN turns a claim into something traceable. Add your sources and it scores each on transparent, tunable axes: authority, directness, freshness, consistency, and licensing. Link a claim to its source and it computes a confidence value from the source's trust, corroboration, recency, and specificity. Every number is shown as a formula, never asserted, and a single uncorroborated source is capped below verified. The output is a provenance ledger where nothing exists without a source behind it, exportable as JSON or a Markdown report. Domain-blind by design.",
    solves:"Most tools ask you to take a claim on faith. SOVEREIGN makes you show the source, scores how much that source is worth on inspectable math, and computes how much confidence a claim has actually earned, so what you hand over is traceable end to end."},
+  {name:"GEEKS", sub:"Sweep a folder into a scored, ranked evidence inventory, hashed and fully offline. Single file.", price:"$49", a:"#3ddc97", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/00f3ed0f-fd25-4ba6-9e72-55baabbed85c", pack:false,
+   render:"renders/geeks.jpg",
+   long:"GEEKS sweeps a pile of project files and turns it into a scored, ranked evidence inventory. Drop a folder in and it reads every file locally, hashes each with SHA-256 for integrity and dedup, classifies it into evidence categories, and tiers it from irreplaceable raw material down to context. Each file gets a Recovery Value and a Handling Risk score, combined into a Priority Index that ranks what to protect first, with high-value targets and risk flags surfaced to the top. Export a RAW_INVENTORY.csv and a full JSON report. Recover first, interpret second.",
+   solves:"When a project folder holds years of originals, captures, and renamed copies, you cannot tell what is irreplaceable and what is noise. GEEKS hashes and scores every file, ranks what matters most to preserve, and flags what is fragile, so you protect the real lineage first, all offline."},
 ];
 const SCOPES = [
   {name:"LAWNSCOPE",    sub:"Scored lawn & turf diagnosis, with a customer-ready proof packet.", price:"$49", a:"#5ee672", buy:"",
@@ -610,7 +614,7 @@ const card = p => `<div class="card" style="--a:${p.a}" data-spot="${slug(p.name
       <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
 
 /* LAUNCH SET — visible SKUs. Held products stay in the arrays but are filtered out of render. Add a slug here to surface a held product. */
-const LIVE = new Set(['thought-vault','batch-prep','dropzone-action','downloads-engine','local-retrieval','repo-alignment','text-normalization','true-diff','truthsource','storyforge','character-capsule-builder','writer-s-room','signalscript','script-surgeon','authorprint','mag-dump','mag-finder','launchbay','sovereign-evidence-engine']);
+const LIVE = new Set(['thought-vault','batch-prep','dropzone-action','downloads-engine','local-retrieval','repo-alignment','text-normalization','true-diff','truthsource','storyforge','character-capsule-builder','writer-s-room','signalscript','script-surgeon','authorprint','mag-dump','mag-finder','launchbay','sovereign-evidence-engine','geeks']);
 const liveEngines   = ENGINES.filter(p=>LIVE.has(slug(p.name)));
 const liveScopes    = SCOPES.filter(p=>LIVE.has(slug(p.name)));
 const liveViridence = VIRIDENCE.filter(p=>LIVE.has(slug(p.name)));
