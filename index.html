@@ -323,18 +323,6 @@
       </div>
     </div>
 
-    <div class="pack">
-      <div>
-        <div class="pbars" id="packbars" aria-hidden="true"></div>
-        <h3 id="pack-name">Operator Pack</h3>
-        <p id="pack-sub">All nine file engines, one purchase. $199 instead of $391 apart.</p>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <span class="pprice" id="pack-price"></span>
-        <a class="buy" id="pack-buy" style="--a:#9fe8d4">Get the pack →</a>
-      </div>
-    </div>
-
     <div class="subhead">The Engines · File tools</div>
     <div class="cards" id="engine-grid"></div>
 
@@ -350,30 +338,8 @@
     <div class="subhead" style="text-align:center;border:0;justify-content:center">The Writers' Bench · Tools for the script</div>
     <p class="lead-copy" style="margin:2px 0 16px;text-align:center">The studio-side line: single-file tools for writing and developing a film or show. Same deal as the rest. Buy once, run offline, keep forever.</p>
 
-    <div class="pack">
-      <div>
-        <div class="pbars" id="film-packbars" aria-hidden="true"></div>
-        <h3 id="film-pack-name">The Writers' Bench</h3>
-        <p id="film-pack-sub"></p>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <span class="pprice" id="film-pack-price"></span>
-        <a class="buy" id="film-pack-buy" style="--a:#caa24a">Get the bench →</a>
-      </div>
-    </div>
-
     <div class="cards" id="film-grid"></div>
 
-    <div class="pack" style="--a:#e06a98;margin-top:18px">
-      <div>
-        <h3 style="color:#e06a98">MAG PACK · the two MAGs, paired</h3>
-        <p>MAG DUMP sorts a folder by what fits your project, MAG FINDER indexes the pile and confirms duplicates by hash. Organize what belongs, surface what is buried. $69 instead of $98 apart.</p>
-      </div>
-      <div style="display:flex;align-items:center;gap:16px">
-        <span class="pprice" style="color:#e06a98">$69</span>
-        <a class="buy" href="https://colmacpulse.lemonsqueezy.com/checkout/buy/759ec775-890a-40e0-a0bc-50cc0a86ad9a" target="_blank" rel="noopener" style="--a:#e06a98">Get the pack →</a>
-      </div>
-    </div>
   </section>
 
   <section class="sec" id="work">
@@ -614,7 +580,7 @@ const card = p => `<div class="card" style="--a:${p.a}" data-spot="${slug(p.name
       <span class="cacts">${p.demo?`<button type="button" class="try" style="--a:${p.a}" data-demo="${p.demo}" data-name="${p.name}">Try it live →</button>`:''}<a class="buy" style="--a:${p.a}" ${buyAttrs(p.buy)}>${p.buy?'Get it →':'Link pending'}</a></span></div></div>`;
 
 /* LAUNCH SET — visible SKUs. Held products stay in the arrays but are filtered out of render. Add a slug here to surface a held product. */
-const LIVE = new Set(['thought-vault','batch-prep','dropzone-action','downloads-engine','local-retrieval','repo-alignment','text-normalization','true-diff','truthsource','storyforge','character-capsule-builder','writer-s-room','signalscript','script-surgeon','authorprint','mag-dump','mag-finder','launchbay','sovereign-evidence-engine','geeks']);
+const LIVE = new Set(['batch-prep','repo-alignment','true-diff','truthsource','character-capsule-builder','script-surgeon','authorprint','launchbay','sovereign-evidence-engine','geeks']);
 const liveEngines   = ENGINES.filter(p=>LIVE.has(slug(p.name)));
 const liveScopes    = SCOPES.filter(p=>LIVE.has(slug(p.name)));
 const liveViridence = VIRIDENCE.filter(p=>LIVE.has(slug(p.name)));
@@ -626,13 +592,14 @@ document.getElementById('film-grid').innerHTML = liveFilm.map(card).join('');
 const hideIfEmpty=(headId,gridId,arr)=>{const d=arr.length?'':'none';const h=document.getElementById(headId),g=document.getElementById(gridId);if(h)h.style.display=d;if(g)g.style.display=d;};
 hideIfEmpty('scope-head','scope-grid',liveScopes);
 hideIfEmpty('viridence-head','viridence-grid',liveViridence);
-document.getElementById('film-pack-name').textContent = FILMPACK.name;
+const fpn=document.getElementById('film-pack-name');
+if(fpn){fpn.textContent = FILMPACK.name;
 document.getElementById('film-pack-sub').textContent  = FILMPACK.sub;
 document.getElementById('film-pack-price').innerHTML  = priceHTML(FILMPACK.price);
 const fpb=document.getElementById('film-pack-buy');
 if(FILMPACK.buy){fpb.href=FILMPACK.buy;fpb.target="_blank";fpb.rel="noopener";}else{fpb.href="#";fpb.classList.add('pending');fpb.textContent="Link pending";}
 const filmbars=document.getElementById('film-packbars');
-FILM.forEach((p,i)=>{const b=document.createElement('i');b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=p.a;b.style.boxShadow="0 0 10px "+p.a;filmbars.appendChild(b);});
+FILM.forEach((p,i)=>{const b=document.createElement('i');b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=p.a;b.style.boxShadow="0 0 10px "+p.a;filmbars.appendChild(b);});}
 const pcard = p => {
   const thumb = p.sigil ? `<div class="pthumb sig" style="--ps:${p.ps};--sigil:url('${p.sigil}')"></div>`
     : p.thumb==="sigil" ? `<div class="pthumb sig" style="--ps:${p.ps}"></div>`
@@ -644,7 +611,8 @@ const pcard = p => {
       <h4>${p.name}</h4><p class="pdesc">${p.blurb}</p></div>${link}</div>`;
 };
 document.getElementById('project-list').innerHTML = PROJECTS.map(pcard).join('');
-document.getElementById('pack-name').textContent = PACK.name;
+const pkn=document.getElementById('pack-name');
+if(pkn){pkn.textContent = PACK.name;
 document.getElementById('pack-sub').textContent  = PACK.sub;
 document.getElementById('pack-price').innerHTML  = priceHTML(PACK.price);
 const pb=document.getElementById('pack-buy');
@@ -652,7 +620,7 @@ if(PACK.buy){pb.href=PACK.buy;pb.target="_blank";pb.rel="noopener";}else{pb.href
 
 const packbars=document.getElementById('packbars');
 SPECTRUM.forEach((c,i)=>{const b=document.createElement('i');
-  b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=c;b.style.boxShadow="0 0 10px "+c;packbars.appendChild(b);});
+  b.style.height=(16+Math.round(Math.abs(Math.sin(i*1.6))*22))+'px';b.style.background=c;b.style.boxShadow="0 0 10px "+c;packbars.appendChild(b);});}
 
 const missing=(PACK.buy?0:1)+(FILMPACK.buy?0:1)+liveEngines.filter(e=>!e.buy).length+liveScopes.filter(s=>!s.buy).length+liveViridence.filter(v=>!v.buy).length+liveFilm.filter(f=>!f.buy).length;
 const isLocal=location.protocol==='file:'||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
