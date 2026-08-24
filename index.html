@@ -305,7 +305,26 @@
     </div>
   </section>
 
-  <section class="sec" id="tools">
+  <section class="sec wyg" id="what-you-get">
+<div class="sechead"><h2>You can always download it again.</h2>
+<span class="kicker">What happens after you buy</span></div>
+<div class="wyggrid">
+<div class="wygitem"><h3>Your receipt is the key</h3><p>Pay and you get a receipt
+email with a download link. That link keeps working. Open the email later and
+download the file again.</p></div>
+<div class="wygitem"><h3>Any computer, any time</h3><p>Lost the file? New laptop?
+Reinstalled everything? Download it again from the same receipt. You never pay
+twice for the same tool.</p></div>
+<div class="wygitem"><h3>No account to lose</h3><p>There is no login and no
+password to forget. Nothing expires, and nothing can be switched off from
+somewhere else.</p></div>
+<div class="wygitem"><h3>It is yours to use</h3><p>Use it on your own machines,
+for your own work and your client work, for as long as you like. No seat count,
+no activation, no phoning home.</p></div>
+</div>
+<p class="wygfoot">Lost the receipt? Email <a href="mailto:hello@colmacpulse.com">hello@colmacpulse.com</a> and I will send your download link.</p>
+</section>
+<section class="sec" id="tools">
     <div class="sechead">
       <h2>The Tools</h2>
       <span class="kicker">Download · own · run offline</span>
@@ -399,7 +418,7 @@
 
 <script>
 /* ===== paste each product's Lemon Squeezy checkout link into "buy" once your store is activated ===== */
-const PACK = { name:"Operator Pack", sub:"All nine file engines, one purchase. $199 instead of $391 apart.", price:"$199", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/891ffcac-00e8-4c58-a634-4a997666f04b" };
+const PACK = { name:"Operator Pack", sub:"All eleven file engines, one purchase. $199 instead of $334 apart.", price:"$199", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/891ffcac-00e8-4c58-a634-4a997666f04b" };
 const ENGINES = [
   {name:"THOUGHT VAULT",      sub:"Turn AI chat exports and loose files into a library you can navigate.", price:"$49",    a:"#22d3ee", buy:"https://colmacpulse.lemonsqueezy.com/checkout/buy/761ca62f-537b-492f-9542-3832e327c64a",
    render:"COVERS/THOUGHT_VAULT_cover.png",
@@ -768,6 +787,18 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
   .spot-demo iframe{width:100%;height:560px;border:0;display:block}
   .spot-buyrow{display:flex;align-items:center;gap:18px;margin-top:30px;flex-wrap:wrap}
   .spot-price{font-size:30px;font-weight:800}.spot-price .cur{color:var(--a)}
+
+/* WHAT-YOU-GET · added 2026-08-24.
+   One reader asked the same question three times in one message: can I
+   download it again if I lose it. The page said "Buy once, keep forever" and
+   he read it as "you get it once, do not lose it". The phrase meant to
+   reassure was the one that created the fear, and nothing answered it. */
+.wyg{border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.wyggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:26px;margin-top:22px}
+.wygitem h3{margin:0 0 8px;font-size:15px;letter-spacing:.01em}
+.wygitem p{margin:0;opacity:.78;line-height:1.6;font-size:14px}
+.wygfoot{margin:26px 0 0;font-size:13px;opacity:.62}
+.wygfoot a{color:inherit}
 </style>
 <div id="spot" class="spot" aria-hidden="true">
   <div class="spot-back"></div>
@@ -953,10 +984,10 @@ if(matchMedia('(prefers-reduced-motion:reduce)').matches){
     Every tool is a single HTML file that runs in your browser. Buy once, keep forever,
     works with no internet. No account, no subscription, nothing leaves your machine.
   </p>
-  <h3 style="color:#e0a53a;font-size:13px;letter-spacing:.14em;margin:30px 0 4px;font-family:ui-monospace,Menlo,Consolas,monospace">FILE ENGINES <span style="color:#5c5750;font-size:11px;letter-spacing:0">16 available</span></h3>
+  <h3 style="color:#e0a53a;font-size:13px;letter-spacing:.14em;margin:30px 0 4px;font-family:ui-monospace,Menlo,Consolas,monospace">FILE ENGINES <span style="color:#5c5750;font-size:11px;letter-spacing:0">17 available</span></h3>
   <p style="color:#8f8a80;margin:0 0 14px;font-size:13px">Sort, package, verify and prove what is in a folder. Offline.</p>
-  <ul style="list-style:none;padding:0;margin:0;display:grid;gap:20px;line-height:1.5;font-size:15px"><li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/FILE_ENGINES_PACK_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/FILE_ENGINES_PACK_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/95b8e73d-4b10-4b80-aa79-bdd8df940343" style="color:#e0a53a;text-decoration:none"><strong>FILE ENGINES PACK</strong></a><span style="color:#8f8a80"> &mdash; Eleven single-purpose file tools, one purchase. Rename ten thousand files, find duplicates by hash, clean a CSV. $99 instead of $179 apart.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $99</b></li>
-<li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/OPERATOR_PACK_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/OPERATOR_PACK_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/891ffcac-00e8-4c58-a634-4a997666f04b" style="color:#e0a53a;text-decoration:none"><strong>Operator Pack</strong></a><span style="color:#8f8a80"> &mdash; All nine file engines, one purchase. $199 instead of $391 apart.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $199</b></li>
+  <ul style="list-style:none;padding:0;margin:0;display:grid;gap:20px;line-height:1.5;font-size:15px"><li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/FILE_ENGINES_PACK_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/FILE_ENGINES_PACK_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/95b8e73d-4b10-4b80-aa79-bdd8df940343" style="color:#e0a53a;text-decoration:none"><strong>FILE ENGINES PACK</strong></a><span style="color:#8f8a80"> &mdash; Eleven small file utilities in one tool. Rename ten thousand files, find duplicates by hash, clean a CSV. Not sold separately. $99 instead of $179 apart.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $99</b></li>
+<li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/OPERATOR_PACK_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/OPERATOR_PACK_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/891ffcac-00e8-4c58-a634-4a997666f04b" style="color:#e0a53a;text-decoration:none"><strong>Operator Pack</strong></a><span style="color:#8f8a80"> &mdash; All eleven file engines, one purchase. $199 instead of $334 apart.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $199</b></li>
     <li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/MAG-PACK-cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/MAG-PACK-cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/759ec775-890a-40e0-a0bc-50cc0a86ad9a" style="color:#e0a53a;text-decoration:none"><strong>MAG PACK</strong></a><span style="color:#8f8a80"> &mdash; MAG DUMP and MAG FINDER together. Sort a folder by project fit, then index it and confirm duplicates by content hash. </span></span><b style="color:#d8d4cc;white-space:nowrap"> $69</b></li>
     <li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/THOUGHT_VAULT_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/THOUGHT_VAULT_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/761ca62f-537b-492f-9542-3832e327c64a" style="color:#e0a53a;text-decoration:none"><strong>THOUGHT VAULT</strong></a><span style="color:#8f8a80"> &mdash; Turn AI chat exports and loose files into a library you can navigate.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $49</b></li>
     <li style="display:flex;gap:18px;align-items:center;padding:0 0 20px;border-bottom:1px solid #1e2229"><a href="#" data-cover="COVERS/DROPZONE_ACTION_cover.png" title="click to see it whole" style="flex:0 0 176px;width:176px;height:132px;border:1px solid #2a2f38;border-radius:6px;background:#0e1115;display:block;overflow:hidden"><img src="COVERS/DROPZONE_ACTION_cover.png" alt="" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block" /></a><span style="flex:1;min-width:0"><a href="https://colmacpulse.lemonsqueezy.com/checkout/buy/c3c18336-6cc7-481a-aafd-a79dfca85c8d" style="color:#e0a53a;text-decoration:none"><strong>DROPZONE ACTION</strong></a><span style="color:#8f8a80"> &mdash; Diagnose a messy batch, get the best next move, prep images in one pass.</span></span><b style="color:#d8d4cc;white-space:nowrap"> $49</b></li>
